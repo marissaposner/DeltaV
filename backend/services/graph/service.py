@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 
 from backend.config import THEGRAPH_API_KEY
-from backend.services.graph.subgraphs import SubgraphService
+from services.graph.subgraphs import SubgraphService
 DEFAULT_PROTOCOL = "aave-governance"
 DEFAULT_CHAIN = "ethereum"
 
