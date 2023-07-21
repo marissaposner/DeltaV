@@ -1,0 +1,58 @@
+/*
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+*/
+interface MultipleListProps {
+  options: Array<object>;
+  className: string;
+}
+
+export default function MultipleList(props: MultipleListProps) {
+  const { options, className } = props;
+
+  return (
+    <fieldset className={className}>
+      <legend className="sr-only">Tokens</legend>
+      <div className="space-y-5">
+        {options
+          ? options.map((item, index) => (
+              <div className="relative flex items-start" key={index}>
+                <div className="flex h-6 items-center">
+                  <input
+                    id="comments"
+                    aria-describedby="comments-description"
+                    name="options"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    value={item.value}
+                  />
+                </div>
+                <div className="ml-3 text-sm leading-6">
+                  <label
+                    htmlFor="comments"
+                    className="font-medium text-gray-900"
+                  >
+                    {item.name}
+                  </label>{" "}
+                  <span id="comments-description" className="text-gray-500">
+                    <span className="sr-only">{item.name} </span>
+                    {item.value}
+                  </span>
+                </div>
+              </div>
+            ))
+          : null}
+      </div>
+    </fieldset>
+  );
+}
