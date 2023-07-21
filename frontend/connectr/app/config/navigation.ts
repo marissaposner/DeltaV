@@ -4,10 +4,11 @@ import {
     ArrowTrendingUpIcon,
     CommandLineIcon,
   } from "@heroicons/react/24/outline";
+import { AppRouting } from "~/utils/routes";
 
 export const NAVIGATION_MENU = [
-    { name: "Actions", href: "#", icon: ArrowTrendingUpIcon, current: true },
-    { name: "Endpoints", href: "#", icon: CommandLineIcon, current: false },
+    { name: "Endpoints", icon: CommandLineIcon, current: true, href: AppRouting.ENDPOINTS },
+    { name: "Actions", icon: ArrowTrendingUpIcon, current: false, href: AppRouting.ACTIONS },
   ];
 
   export const TEAMS_LIST = [

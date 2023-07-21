@@ -132,12 +132,9 @@ export default function App() {
                         />
                       </div>
                       <nav className="flex flex-1 flex-col">
-                        <ul
-                          role="list"
-                          className="flex flex-1 flex-col gap-y-7"
-                        >
+                        <ul className="flex flex-1 flex-col gap-y-7">
                           <li>
-                            <ul role="list" className="-mx-2 space-y-1">
+                            <ul className="-mx-2 space-y-1">
                               {NAVIGATION_MENU.map((item) => (
                                 <li key={item.name}>
                                   <a
@@ -168,7 +165,7 @@ export default function App() {
                             <div className="text-xs font-semibold leading-6 text-gray-400">
                               Your teams
                             </div>
-                            <ul role="list" className="-mx-2 mt-2 space-y-1">
+                            <ul className="-mx-2 mt-2 space-y-1">
                               {TEAMS_LIST.map((team) => (
                                 <li key={team.name}>
                                   <a

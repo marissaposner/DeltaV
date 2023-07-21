@@ -1,7 +1,10 @@
 import { classNames } from "~/utils/common";
 import { NAVIGATION_MENU, TEAMS_LIST } from "~/config/navigation";
+import { Link, useLocation } from "@remix-run/react";
 
 export default function SidebarNavigation() {
+  const location = useLocation();
+
   return (
     <>
       {/* Static sidebar for desktop */}
@@ -20,7 +23,7 @@ export default function SidebarNavigation() {
                       <a
                         href={item.href}
                         className={classNames(
-                          item.current
+                          item.href == location.pathname
                             ? "bg-gray-50 text-indigo-600"
                             : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
                           "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
@@ -28,7 +31,7 @@ export default function SidebarNavigation() {
                       >
                         <item.icon
                           className={classNames(
-                            item.current
+                            item.href == location.pathname
                               ? "text-indigo-600"
                               : "text-gray-400 group-hover:text-indigo-600",
                             "h-6 w-6 shrink-0"
@@ -45,11 +48,11 @@ export default function SidebarNavigation() {
                 <div className="text-xs font-semibold leading-6 text-gray-400">
                   Support
                 </div>
-                <ul role="list" className="-mx-2 mt-2 space-y-1">
+                <ul className="-mx-2 mt-2 space-y-1">
                   {TEAMS_LIST.map((team) => (
                     <li key={team.name}>
-                      <a
-                        href={team.href}
+                      <Link
+                        to={team.href}
                         className={classNames(
                           team.current
                             ? "bg-gray-50 text-indigo-600"
@@ -67,7 +70,7 @@ export default function SidebarNavigation() {
                           aria-hidden="true"
                         />
                         {team.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
