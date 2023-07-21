@@ -1,0 +1,3 @@
+[submodule "subgraphs"]
+	path = backend/subgraphs
+	url = https://github.com/messari/subgraphs.git
