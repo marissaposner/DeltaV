@@ -32,19 +32,12 @@ export interface ISourceAttributes
 export const SourceCreationAttributesSchema =
   Joi.object<ISourceCreationAttributes>({
     // Variables
-    sourceNameEnum: SourceValidation.label("source name").required(),
+    sourceNameEnum: SourceValidation.required(),
 
     // References
   })
     .meta({ className: "ISourceCreationAttributes" })
     .description("The attributes for the creation of a source db object");
-
-export const SourceUpdatingAttributesSchema = Joi.object({
-  // Variables
-  sourceNameEnum: SourceValidation.optional(),
-})
-  .meta({ className: "ISourceUpdatingAttributes" })
-  .description("The attributes for the updating of a source db object");
 
 @Table({
   tableName: "sources",
