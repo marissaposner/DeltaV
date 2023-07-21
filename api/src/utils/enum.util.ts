@@ -14,7 +14,7 @@ export enum DexProductEnum {
 
 export const DexProductNames = {
   [DexProductEnum.BALANCER]: "Balancer",
-  [DexProductEnum.CURVE]: "Curbe",
+  [DexProductEnum.CURVE]: "Curve",
   [DexProductEnum.PANCAKESWAP]: "Pancake Swap",
   [DexProductEnum.SUSHISWAP]: "Sushi Swap",
   [DexProductEnum.UNISWAP]: "Uniswap",
