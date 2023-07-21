@@ -1,8 +1,8 @@
-export enum Source {
+export enum SourceEnum {
   DEFI_LLAMA = "DEFI_LLAMA",
 }
 
-export enum DexProduct {
+export enum DexProductEnum {
   BALANCER = "BALANCER",
   CURVE = "CURVE",
   PANCAKESWAP = "PANCAKESWAP",
@@ -10,10 +10,23 @@ export enum DexProduct {
   UNISWAP = "UNISWAP",
 }
 
-export enum LendingProduct {
+export enum LendingProductEnum {
   AAVE = "AAVE",
   COMPOUND = "COMPOUND",
   MORPHO = "MORPHO",
+}
+
+export enum LendingFieldEnum {
+  COUNT_TRANSACTIONS = "COUNT_TRANSACTIONS",
+  COUNT_TRANSACTIONS_BORROW = "COUNT_TRANSACTIONS_BORROW",
+  COUNT_TRANSACTIONS_SUPPLY = "COUNT_TRANSACTIONS_SUPPLY",
+  COUNT_UNIQUE_BORROWERS = "COUNT_UNIQUE_BORROWERS",
+  COUNT_UNIQUE_SUPPLIERS = "COUNT_UNIQUE_SUPPLIERS",
+  RATE_APR = "RATE_APR",
+  RATE_APY = "RATE_APY",
+  SUM_AMOUNT_BORROW = "SUM_AMOUNT_BORROW",
+  SUM_AMOUNT_SUPPLY = "SUM_AMOUNT_SUPPLY",
+  TVL = "TVL",
 }
 
 export const LendingFieldNames = {

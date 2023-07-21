@@ -1,4 +1,4 @@
-import { DexProduct, LendingProduct, Source } from "./enum.utils";
+import { DexProduct, LendingField, LendingProduct, Source } from "../utils/enum.utils";
 
 
 interface ISource {
@@ -22,16 +22,8 @@ interface IField {
 }
 
 export interface ILendingField extends IField {
-    count_transactions: string;
-    count_transactions_borrow: string;
-    count_transactions_supply: string;
-    count_unique_borrowers: string;
-    count_unique_suppliers: string;
-    rate_apr: string;
-    rate_apy: string;
-    sum_amount_borrow: string;
-    sum_amount_supply: string;
-    tvl: string;
+    field_type: LendingField;
+    
 }
 
 interface IDataPoint {
@@ -69,7 +61,7 @@ TVL
 APR
 Volume
 Transactions # count
-# of unique depositors
+# of unique depositors       
 sum of deposit amounts
 # of unique borrowers
 # of deposits
