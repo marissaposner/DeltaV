@@ -1,6 +1,5 @@
-import ProductModel from "./Product.model";
 import SourceModel from "./Source.model";
 
-const models = [ProductModel, SourceModel];
+const models = [SourceModel];
 
 export default models;

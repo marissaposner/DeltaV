@@ -2,12 +2,14 @@ import { Dialect } from "sequelize";
 import { Sequelize } from "sequelize-typescript";
 
 import env from "src/utils/env.util";
+import modelsListing from "./models/_.model";
 
 const sequelize = env.db.isUrlAccess
   ? new Sequelize(env.db.databaseUrl, {
       dialect: "postgres",
       logging: false,
-      models: [__dirname + "/models"],
+      models: modelsListing,
+      // models: [__dirname + "/models"],
       dialectOptions: {
         ssl: {
           rejectUnauthorized: false,
@@ -25,7 +27,8 @@ const sequelize = env.db.isUrlAccess
       {
         host: env.db.host,
         dialect: env.db.driver as Dialect,
-        models: [__dirname + "/models"],
+        models: modelsListing,
+        // models: [__dirname + "/models"],
         port: env.db.port,
         // logging: console.log,
         logging: false,

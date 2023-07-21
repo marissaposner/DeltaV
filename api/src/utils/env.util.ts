@@ -40,39 +40,42 @@ const configSet: IEnvConfig = {
     // Determine if to use the "url" or the "creds"
     isUrlAccess:
       (isProd
-        ? process.env.LOCAL_DB_ACCESS_PATH
-        : process.env.PROD_DB_ACCESS_PATH) === "url",
+        ? process.env.PROD_DB_ACCESS_PATH
+        : process.env.LOCAL_DB_ACCESS_PATH) === "url",
 
     // Heroku injects this variable for db
-    databaseUrl: process.env.DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL || "",
 
     // The credentials for the database
-    driver: isProd ? process.env.LOCAL_DB_DRIVER : process.env.PROD_DB_DRIVER,
-    database: isProd ? process.env.LOCAL_DB_NAME : process.env.PROD_DB_NAME,
-    host: isProd ? process.env.LOCAL_DB_HOST : process.env.PROD_DB_HOST,
-    password: isProd
-      ? process.env.LOCAL_DB_PASSWORD
-      : process.env.PROD_DB_PASSWORD,
-    port: isProd
-      ? process.env.LOCAL_DB_PORT
-      : process.env.PROD_DB_PORT
-      ? parseInt(
-          isProd ? process.env.LOCAL_DB_PORT : process.env.PROD_DB_PORT,
-          10
-        )
-      : 5432,
-    username: isProd
-      ? process.env.LOCAL_DB_USERNAME
-      : process.env.PROD_DB_USERNAME,
+    driver:
+      (isProd ? process.env.PROD_DB_DRIVER : process.env.LOCAL_DB_DRIVER) || "",
+    database:
+      (isProd ? process.env.PROD_DB_NAME : process.env.LOCAL_DB_NAME) || "",
+    host: (isProd ? process.env.PROD_DB_HOST : process.env.LOCAL_DB_HOST) || "",
+    password:
+      (isProd ? process.env.PROD_DB_PASSWORD : process.env.LOCAL_DB_PASSWORD) ||
+      "",
+    port:
+      parseInt(
+        (isProd ? process.env.PROD_DB_PORT : process.env.LOCAL_DB_PORT) || "",
+        10
+      ) || 5432,
+    username:
+      (isProd ? process.env.PROD_DB_USERNAME : process.env.LOCAL_DB_USERNAME) ||
+      "",
   },
   server: {
-    apiVersion: isProd
-      ? process.env.LOCAL_SERVER_API_VERSION
-      : process.env.PROD_SERVER_API_VERSION,
-    appBaseUrl: isProd
-      ? process.env.LOCAL_APP_BASE_URL
-      : process.env.PROD_APP_BASE_URL,
-    port: isProd ? process.env.LOCAL_SERVER_PORT : process.env.PROD_SERVER_PORT,
+    apiVersion:
+      (isProd
+        ? process.env.PROD_SERVER_API_VERSION
+        : process.env.LOCAL_SERVER_API_VERSION) || "",
+    appBaseUrl:
+      (isProd
+        ? process.env.PROD_APP_BASE_URL
+        : process.env.LOCAL_APP_BASE_URL) || "",
+    port:
+      (isProd ? process.env.PROD_SERVER_PORT : process.env.LOCAL_SERVER_PORT) ||
+      "",
   },
 };
 
