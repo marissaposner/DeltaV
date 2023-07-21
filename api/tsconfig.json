@@ -1,0 +1,26 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/server.ts",
+    "src/types/express/index.d.ts"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "dist",
+    "strict": true,
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "noImplicitAny": true
+  },
+  "include": ["src/**/*.ts", "index.ts"],
+  "exclude": ["node_modules"]
+}
