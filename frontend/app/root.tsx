@@ -1,4 +1,5 @@
 import { ChakraProvider, Box, Heading } from "@chakra-ui/react";
+import type { MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -9,6 +10,11 @@ import {
   useCatch,
 } from "@remix-run/react";
 
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  viewport: "width=device-width,initial-scale=1",
+});
+
 function Document({
   children,
   title = "App title",
@@ -18,14 +24,9 @@ function Document({
 }) {
   return (
     <html lang="en">
-      <head>        
-        <title>{title}</title>
-        <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1"
-        />
+      <head>
         <Meta />
+        <title>{title}</title>
         <Links />
       </head>
       <body>
@@ -74,7 +75,7 @@ export function ErrorBoundary({ error }: { error: Error }) {
       <ChakraProvider>
         <Box>
           <Heading as="h1" bg="blue.500">
-            [ErrorBoundary]: There was an error: {error}
+            [ErrorBoundary]: There was an error: {error.message}
           </Heading>
         </Box>
       </ChakraProvider>
