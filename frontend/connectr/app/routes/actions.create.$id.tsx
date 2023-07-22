@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Title } from "~/components/common/Title";
+import InputText from "~/components/forms/InputText";
+import Select from "~/components/forms/Select";
 import { requireAuth } from "~/services/auth.server";
 
 export const loader = async ({ request }) => {
@@ -8,6 +11,31 @@ export const loader = async ({ request }) => {
 };
 
 export default function CreateActions() {
+  const [actionName, setActionName] = useState(null);
+  const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+  const [selectedIfCondition, setSelectedIfCondition] = useState(null);
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [selectedOperator, setSelectedOperator] = useState(null);
+
+  const optionsEndpoint = [{ id: 1, name: "Endpoint XYZ" }];
+  const optionsIfConditions = [{ id: 1, name: "Condition X" }];
+  const optionsActions = [{ id: 1, name: "Action X" }];
+  const optionsOperators = [{ id: 1, name: "Greater Than (>)" }];
+
+  useEffect(() => {
+    console.log("Text in actionName:", actionName);
+    console.log("Selected selectedEndpoint:", selectedEndpoint);
+    console.log("Selected selectedIfCondition:", selectedIfCondition);
+    console.log("Selected selectedAction:", selectedAction);
+    console.log("Selected selectedOperator:", selectedOperator);
+  }, [
+    actionName,
+    selectedEndpoint,
+    selectedIfCondition,
+    selectedAction,
+    selectedOperator,
+  ]);
+
   return (
     <>
       <Title title="Create Action" className="mb-9" ctaTitle="Save Action" />
@@ -30,12 +58,10 @@ export default function CreateActions() {
                 Action Name
               </label>
               <div className="mt-2">
-                <input
-                  id="name"
+                <InputText
                   name="name"
-                  type="text"
+                  clickEvent={setActionName}
                   placeholder="Name of action"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -48,16 +74,10 @@ export default function CreateActions() {
                 For Endpoint with id
               </label>
               <div className="mt-2">
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
+                <Select
+                  options={optionsEndpoint}
+                  clickEvent={setSelectedEndpoint}
+                />
               </div>
             </div>
 
@@ -69,16 +89,10 @@ export default function CreateActions() {
                 If such field
               </label>
               <div className="mt-2">
-                <select
-                  id="field"
-                  name="field"
-                  autoComplete="field"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
+                <Select
+                  options={optionsIfConditions}
+                  clickEvent={setSelectedIfCondition}
+                />
               </div>
             </div>
 
@@ -89,29 +103,37 @@ export default function CreateActions() {
               >
                 is
               </label>
-              <div className="mt-2">
-                <select
-                  id="operator1"
-                  name="operator1"
-                  autoComplete="operator1"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
-              </div>
-              <div className="mt-2">
-                <select
-                  id="operator2"
-                  name="operator2"
-                  autoComplete="operator2"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
+              <div className="flex justify-between">
+                <div className="sm:col-span-3 basis-1/2 mr-1">
+                  <label
+                    htmlFor="first-name"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Operator
+                  </label>
+                  <div className="mt-2">
+                    <Select
+                      options={optionsOperators}
+                      clickEvent={setSelectedOperator}
+                    />
+                  </div>
+                </div>
+
+                <div className="sm:col-span-3 basis-1/2">
+                  <label
+                    htmlFor="last-name"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Value
+                  </label>
+                  <div className="mt-2">
+                    <InputText
+                      inputType="number"
+                      name="conditionValue"
+                      placeholder="Input a number"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -123,16 +145,10 @@ export default function CreateActions() {
                 Then do
               </label>
               <div className="mt-2">
-                <select
-                  id="field"
-                  name="field"
-                  autoComplete="field"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
+                <Select
+                  options={optionsActions}
+                  clickEvent={setSelectedAction}
+                />
               </div>
             </div>
           </div>

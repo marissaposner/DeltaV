@@ -50,7 +50,7 @@ export default function MultipleList(props: MultipleListProps) {
               <div className="relative flex items-start" key={index}>
                 <div className="flex h-6 items-center">
                   <input
-                    id="comments"
+                    id={"listItem" + index}
                     aria-describedby="comments-description"
                     name="options"
                     type="checkbox"
@@ -62,12 +62,15 @@ export default function MultipleList(props: MultipleListProps) {
                 </div>
                 <div className="ml-3 text-sm leading-6">
                   <label
-                    htmlFor="comments"
+                    htmlFor={"listItem" + index}
                     className="font-medium text-gray-900"
                   >
                     {item.name}
                   </label>{" "}
-                  <span id="comments-description" className="text-gray-500">
+                  <span
+                    id={"listItem" + index + "-description"}
+                    className="text-gray-500"
+                  >
                     <span className="sr-only">{item.name} </span>
                     {item.value}
                   </span>
