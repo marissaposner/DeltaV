@@ -1,4 +1,4 @@
-# Connectr
+# Delta V
 ETH Global Paris Hackathon Project
 
 
