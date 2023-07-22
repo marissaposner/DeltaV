@@ -5,13 +5,20 @@ import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
 import InputTextArea from "~/components/forms/InputTextArea";
 import MultipleList from "~/components/forms/MultipleList";
-import Select from "~/components/forms/Select";
-import { TokenProductNames } from "~/models/products";
+
+import {
+  DexFieldNames,
+  DexProductNames,
+  LendingFieldNames,
+  LendingProductNames,
+  TokenProductNames,
+} from "~/models/products";
 import { createEndpoint } from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
 import { convertObjectToNameValue } from "~/utils/common";
 import { AppRouting } from "~/utils/routes";
 import LoaderSvg from "~/images/loader.svg";
+import SwitchGroupButton from "~/components/switches/SwitchGroupButton";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -47,18 +54,19 @@ export const action = async ({ request }: ActionArgs) => {
 };
 
 export default function CreateEndpoint() {
-  const defiOptions = [{ id: 1, name: "Lending" }];
-  const defiOptionsSecondary = [{ id: 1, name: "Staking" }];
-
   const tokens = convertObjectToNameValue(TokenProductNames);
+  const dex = convertObjectToNameValue(DexProductNames);
+  const lending = convertObjectToNameValue(LendingProductNames);
 
   const abiFetcher = useFetcher();
   const [name, setName] = useState(null);
   const [contractAddress, setContractAddress] = useState(null);
   const [abi, setABI] = useState("");
-  const [defiOption, setDefiOption] = useState(null);
-  const [secondaryDefiOption, setSecondaryDefiOption] = useState(null);
+  const [currentProductSelected, setCurrentProductSelected] = useState({});
   const [selectedTokens, setSelectedTokens] = useState(new Set());
+  const [selectedProducts, setSelectedProducts] = useState(new Map());
+  const [dexProducts, setDexProducts] = useState(new Map());
+  const [lendingProducts, setLendingProducts] = useState(new Map());
 
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
@@ -74,30 +82,59 @@ export default function CreateEndpoint() {
     } else setABI("");
   }, [abiFetcher]);
 
-  useEffect(() => {
-    console.log("Name changed", name);
-    console.log("ABI changed", abi);
-    console.log("contractAddress changed", contractAddress);
-    console.log("Checked items in selectedTokens:", Array.from(selectedTokens));
+  const loadDexAttributes = (value) => {
+    const result = convertObjectToNameValue(DexFieldNames);
 
-    console.log("Checked items in attributes:", Array.from(attributes));
+    setAttributes(result);
+    setCurrentProductSelected({
+      name: DexProductNames[value],
+      value,
+    });
+
     console.log(
-      "Checked items in selectedAttributes:",
-      Array.from(selectedAttributes)
+      DexProductNames[value],
+      value,
+      currentProductSelected,
+      selectedProducts
     );
+  };
 
-    console.log("Checked items in secondaryDefiOption:", defiOption);
-    console.log("Checked items in defiOption:", secondaryDefiOption);
-  }, [
-    abi,
-    name,
-    contractAddress,
-    selectedTokens,
-    defiOption,
-    secondaryDefiOption,
-    selectedAttributes,
-    attributes,
-  ]);
+  const loadLendingAttributes = (value) => {
+    const result = convertObjectToNameValue(LendingFieldNames);
+
+    setAttributes(result);
+    setCurrentProductSelected({
+      name: LendingProductNames[value],
+      value,
+    });
+  };
+
+  const addAttributeToProduct = (value) => {
+    console.log(value, currentProductSelected, selectedProducts);
+
+    if (selectedProducts.has(currentProductSelected.value)) {
+      let newAttributes = selectedProducts.get(currentProductSelected.value);
+
+      //check for value, if exists remove it, otherwise add it
+      const check = newAttributes.filter((filterValue) => {
+        return filterValue == value;
+      });
+
+      if (check.length == 0) newAttributes.push(value);
+      else
+        newAttributes = newAttributes.filter((filterValue) => {
+          return filterValue != value;
+        });
+
+      selectedProducts.set(currentProductSelected.value, [
+        ...new Set(newAttributes),
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    setSelectedProducts(new Map([...dexProducts, ...lendingProducts]));
+  }, [dexProducts, lendingProducts]);
 
   return (
     <Form method="post">
@@ -156,7 +193,7 @@ export default function CreateEndpoint() {
             className="text-sm font-bold leading-6 text-gray-900 flex items-center"
           >
             <span className="mr-2">ABI </span>
-            {abiFetcher.state === "loading" ? (
+            {abiFetcher.state != "idle" ? (
               <span>
                 <img src={LoaderSvg} width={20} alt="loader" />
               </span>
@@ -176,18 +213,25 @@ export default function CreateEndpoint() {
 
       <div className="flex justify-between">
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
-          <h2 className="mb-4 font-bold">Defi</h2>
-          <Select
-            name="defiOptions"
-            options={defiOptions}
-            className="mb-2"
-            clickEvent={setDefiOption}
+          <h2 className="mb-4 font-bold">DEX</h2>
+          <MultipleList
+            name="dex"
+            options={dex}
+            className="mb-4"
+            clickEvent={setDexProducts}
+            clickIconEvent={loadDexAttributes}
+            showIcon={true}
+            hideValue={true}
           />
-          <Select
-            name="defiOptionsSecondary"
-            options={defiOptionsSecondary}
+          <h2 className="mb-4 font-bold">Lending</h2>
+          <MultipleList
+            name="lending"
+            options={lending}
             className="mb-8"
-            clickEvent={setSecondaryDefiOption}
+            clickEvent={setLendingProducts}
+            clickIconEvent={loadLendingAttributes}
+            showIcon={true}
+            hideValue={true}
           />
           <hr className="mb-5" />
           <h2 className="mb-4 font-bold">Tokens</h2>
@@ -209,16 +253,36 @@ export default function CreateEndpoint() {
           </button>
         </div>
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
-          <h2 className="mb-4 font-bold">Attributes</h2>
-          <MultipleList
-            name="attributes"
-            options={attributes}
-            className="mb-8"
-            clickEvent={setAttributes}
-          />
+          <h2 className="mb-4 font-bold">
+            Attributes {currentProductSelected.name}
+          </h2>
+          {attributes && Array.isArray(attributes)
+            ? attributes.map((item, index) => (
+                <SwitchGroupButton
+                  item={item}
+                  key={
+                    currentProductSelected.value +
+                    "-" +
+                    item.value +
+                    "-" +
+                    index
+                  }
+                  className="mb-4"
+                  clickEvent={addAttributeToProduct}
+                  enable={
+                    selectedProducts.has(currentProductSelected.value) &&
+                    selectedProducts
+                      .get(currentProductSelected.value)
+                      .includes(item.value)
+                      ? true
+                      : false
+                  }
+                />
+              ))
+            : null}
         </div>
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
-          <h2 className="mb-4 font-bold">Fields</h2>
+          <h2 className="mb-4 font-bold">Selected Attributes</h2>
           <MultipleList
             name="fields"
             options={selectedAttributes}

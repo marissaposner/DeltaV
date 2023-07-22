@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MultipleListItem from "./MultipleListItem";
 
 /*
   This example requires some changes to your config:
@@ -19,20 +20,31 @@ interface MultipleListProps {
   name: string;
   className: string;
   clickEvent?: (event: any) => any;
+  clickIconEvent?: (event: any) => any;
+  showIcon?: boolean;
+  hideValue?: boolean;
 }
 
 export default function MultipleList(props: MultipleListProps) {
-  const { options, className, clickEvent, name } = props;
-  const [checkedItems, setCheckedItems] = useState(new Set());
+  const {
+    options,
+    className,
+    clickEvent,
+    clickIconEvent,
+    name,
+    showIcon,
+    hideValue,
+  } = props;
+  const [checkedItems, setCheckedItems] = useState(new Map());
 
   const handleCheckChange = (event) => {
     const itemId = event.target.value;
-    const newCheckedItems = new Set(checkedItems);
+    const newCheckedItems = new Map(checkedItems);
 
     if (checkedItems.has(itemId)) {
       newCheckedItems.delete(itemId);
     } else {
-      newCheckedItems.add(itemId);
+      newCheckedItems.set(itemId, []);
     }
 
     setCheckedItems(newCheckedItems);
@@ -48,35 +60,17 @@ export default function MultipleList(props: MultipleListProps) {
       <div className="space-y-5">
         {options && Array.isArray(options) && options.length > 0
           ? options.map((item, index) => (
-              <div className="relative flex items-start" key={index}>
-                <div className="flex h-6 items-center">
-                  <input
-                    id={"listItem" + index}
-                    aria-describedby="comments-description"
-                    name={name}
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    value={item.value}
-                    checked={checkedItems.has(item.value)}
-                    onChange={handleCheckChange}
-                  />
-                </div>
-                <div className="ml-3 text-sm leading-6">
-                  <label
-                    htmlFor={"listItem" + index}
-                    className="font-medium text-gray-900"
-                  >
-                    {item.name}
-                  </label>{" "}
-                  <span
-                    id={"listItem" + index + "-description"}
-                    className="text-gray-500"
-                  >
-                    <span className="sr-only">{item.name} </span>
-                    {item.value}
-                  </span>
-                </div>
-              </div>
+              <MultipleListItem
+                key={item.value + "-" + index}
+                item={item}
+                index={index}
+                handleCheckChange={handleCheckChange}
+                handleIconClick={clickIconEvent}
+                name={name}
+                showIcon={showIcon}
+                hideValue={hideValue}
+                checkedItems={checkedItems}
+              />
             ))
           : null}
       </div>
