@@ -3,18 +3,10 @@
 Use env var to override
 """
 import os
-
-from dotenv import load_dotenv
-
-
-load_dotenv()
-GRAPH_API_KEY = os.getenv("GRAPH_API_KEY")
-
-
+import psycopg2
 from configparser import ConfigParser
 
-
-def config(filename='/backend/database.ini', section='postgresql'):
+def make_conn(filename='backend/database/database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -28,5 +20,5 @@ def config(filename='/backend/database.ini', section='postgresql'):
             db[param[0]] = param[1]
     else:
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
+    connection = psycopg2.connect(**db)
+    return connection
