@@ -1,14 +1,17 @@
 import type { ActionArgs, V2_MetaFunction } from "@remix-run/node";
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
+import { Form, useFetcher } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
 import InputTextArea from "~/components/forms/InputTextArea";
 import MultipleList from "~/components/forms/MultipleList";
 import Select from "~/components/forms/Select";
-import { createEndpoint, getAPIBaseURL } from "~/services/api.server";
+import { TokenProductNames } from "~/models/products";
+import { createEndpoint } from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
+import { convertObjectToNameValue } from "~/utils/common";
 import { AppRouting } from "~/utils/routes";
+import LoaderSvg from "~/images/loader.svg";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -46,19 +49,8 @@ export const action = async ({ request }: ActionArgs) => {
 export default function CreateEndpoint() {
   const defiOptions = [{ id: 1, name: "Lending" }];
   const defiOptionsSecondary = [{ id: 1, name: "Staking" }];
-  const tokens = [
-    { name: "Ethereum", value: "ETH" },
-    { name: "USD Coin", value: "USDC" },
-    { name: "Wrapped stETH", value: "WstETH" },
-    { name: "Rocket Pool ETH", value: "rETH" },
-    { name: "Dai", value: "DAI" },
-    { name: "Tether USD", value: "USDT" },
-    { name: "Polygon", value: "MATIC" },
-    { name: "Binance Coin", value: "BNB" },
-    { name: "Wrapped Bitcoin", value: "WBTC" },
-  ];
-  const attributes = [];
-  const fields = [];
+
+  const tokens = convertObjectToNameValue(TokenProductNames);
 
   const abiFetcher = useFetcher();
   const [name, setName] = useState(null);
@@ -67,8 +59,9 @@ export default function CreateEndpoint() {
   const [defiOption, setDefiOption] = useState(null);
   const [secondaryDefiOption, setSecondaryDefiOption] = useState(null);
   const [selectedTokens, setSelectedTokens] = useState(new Set());
-  const [selectedAttributes, setSelectedAttributes] = useState(new Set());
-  const [selectedFields, setSelectedFields] = useState(new Set());
+
+  const [attributes, setAttributes] = useState([]);
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
 
   useEffect(() => {
     if (
@@ -86,11 +79,13 @@ export default function CreateEndpoint() {
     console.log("ABI changed", abi);
     console.log("contractAddress changed", contractAddress);
     console.log("Checked items in selectedTokens:", Array.from(selectedTokens));
+
+    console.log("Checked items in attributes:", Array.from(attributes));
     console.log(
       "Checked items in selectedAttributes:",
       Array.from(selectedAttributes)
     );
-    console.log("Checked items in selectedFields:", Array.from(selectedFields));
+
     console.log("Checked items in secondaryDefiOption:", defiOption);
     console.log("Checked items in defiOption:", secondaryDefiOption);
   }, [
@@ -101,7 +96,7 @@ export default function CreateEndpoint() {
     defiOption,
     secondaryDefiOption,
     selectedAttributes,
-    selectedFields,
+    attributes,
   ]);
 
   return (
@@ -158,9 +153,14 @@ export default function CreateEndpoint() {
         <div className="sm:col-span-4 mt-4 max-w-6xl">
           <label
             htmlFor="ABI"
-            className="block text-sm font-bold leading-6 text-gray-900"
+            className="text-sm font-bold leading-6 text-gray-900 flex items-center"
           >
-            ABI
+            <span className="mr-2">ABI </span>
+            {abiFetcher.state === "loading" ? (
+              <span>
+                <img src={LoaderSvg} width={20} alt="loader" />
+              </span>
+            ) : null}
           </label>
           <div className="mt-2">
             <InputTextArea
@@ -214,16 +214,16 @@ export default function CreateEndpoint() {
             name="attributes"
             options={attributes}
             className="mb-8"
-            clickEvent={setSelectedAttributes}
+            clickEvent={setAttributes}
           />
         </div>
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">Fields</h2>
           <MultipleList
             name="fields"
-            options={fields}
+            options={selectedAttributes}
             className="mb-8"
-            clickEvent={setSelectedFields}
+            clickEvent={setSelectedAttributes}
           />
         </div>
       </div>

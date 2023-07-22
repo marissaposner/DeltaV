@@ -16,3 +16,16 @@ export function getColours() {
 export function getRandomArbitrary(min : number, max : number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+export function convertObjectToNameValue(obj: object) {
+  let result = []
+
+  for (const key in obj) {
+    result.push({
+      name: obj[key],
+      value: key
+    })
+}
+  
+  return result
+}

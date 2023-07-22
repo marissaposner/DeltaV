@@ -46,7 +46,7 @@ export default function MultipleList(props: MultipleListProps) {
     <fieldset className={className}>
       <legend className="sr-only">Tokens</legend>
       <div className="space-y-5">
-        {options
+        {options && Array.isArray(options) && options.length > 0
           ? options.map((item, index) => (
               <div className="relative flex items-start" key={index}>
                 <div className="flex h-6 items-center">
