@@ -4,10 +4,12 @@ import os
 
 import pandas as pd
 import requests
+import sys
+sys.path.append('../')
 
-from backend.config import THEGRAPH_API_KEY
-from services.graph.subgraphs import SubgraphService
-DEFAULT_PROTOCOL = "aave-governance"
+from backend.config import GRAPH_API_KEY
+from backend.services.graph.subgraphs import SubgraphService
+DEFAULT_PROTOCOL = "aave-forks"
 DEFAULT_CHAIN = "ethereum"
 
 CHAINS = [
@@ -28,13 +30,29 @@ CHAINS = [
     "moonbeam",
     "moonriver",
 ]
+
+# arbitrum_subgraphs =['JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk']
 def execute_query_thegraph(subgraph_id, query, hosted=True):
     namespace = "messari"
+    print(subgraph_id)
+    
     if hosted:
         base_url = f"https://api.thegraph.com/subgraphs/name/{namespace}/"
+        print('base_url', base_url)
+    # if subgraph_id in arbitrum_subgraphs:
+    #     print('in arbitrum subgraphs')
+    #     base_url = f"https://gateway-arbitrum.network.thegraph.com/api/{GRAPH_API_KEY}/subgraphs/id/"
+    #     print('base_url', base_url)
+
     else:
-        base_url = f"https://gateway.thegraph.com/api/{THEGRAPH_API_KEY}/subgraphs/id/"
+        # base_url = f"https://gateway.thegraph.com/api/{GRAPH_API_KEY}/subgraphs/id/"
+        base_url = f"https://gateway-arbitrum.network.thegraph.com/api/{GRAPH_API_KEY}/subgraphs/id/"
+        print('base_url', base_url)
+
+
     query_url = f"{base_url}{subgraph_id}"
+
+    print('query_url',query_url)
     r = requests.post(query_url, json={"query": query})
     r.raise_for_status()
     try:
@@ -46,9 +64,13 @@ def execute_query_thegraph(subgraph_id, query, hosted=True):
         print(r.json())
 class GraphService:
     def __init__(self, protocol=DEFAULT_PROTOCOL, chain=DEFAULT_CHAIN):
+        print('protocol', protocol)
+        print('DEFAULT CHAIN', chain)
+        os.chdir('..')
         self.build_subgraphs_json()
+        print('after build_subgraphs_json')
         self.subgraph = SubgraphService(protocol, chain)
-
+    
     def ensure_enumerable(self, data):
         if not isinstance(data, list):
             return [data]
@@ -77,6 +99,10 @@ class GraphService:
     
 
     def build_subgraphs_json(self):
+        # sys.path.append('../')
+        # print('sys.path', sys.path)
+        print('os.getcwdb()', os.getcwdb())
+        print('whole path', os.getcwdb().decode("utf-8") + "/subgraphs/deployment/deployment.json")
         deployments = json.load(
             open(os.getcwdb().decode("utf-8") + "/subgraphs/deployment/deployment.json")
         )
@@ -114,3 +140,69 @@ class GraphService:
             ),
         )
         return df
+
+print(os.getcwdb().decode("utf-8"))
+query = """{
+  tokens(first: 5) {
+    id
+    name
+    symbol
+    decimals
+  }
+  rewardTokens(first: 5) {
+    id
+    token {
+      id
+    }
+    type
+  }
+}"""
+
+query1 = """{
+  markets (where: {inputToken_: {symbol_not: "GHO"}}) {
+    inputToken {
+        name
+        id
+        symbol
+      }
+      outputToken {
+        name
+        symbol
+        id
+      }
+    hourlySnapshots (first: 100, orderBy: blockNumber, orderDirection: desc) {
+    totalValueLockedUSD
+    timestamp
+    rates(where: {side: BORROWER, type: VARIABLE}) {
+      rate
+      maturityBlock
+      side
+      type
+    }
+  }
+}
+}"""
+
+query_liquidity = """
+{
+  liquidityPools {
+    createdTimestamp
+    createdBlockNumber
+    name
+    id
+    symbol
+    totalValueLockedUSD
+    cumulativeVolumeUSD
+  }
+}"""
+graphs =['pancakeswap-v3-ethereum', 'sushiswap', 'trader-joe']
+for graph in graphs:
+    print('graph', graph)
+    graph_service = GraphService(protocol = graph, chain='arbitrum')
+    print('after graph_service')
+    result = graph_service.query_thegraph(query_liquidity)
+    print()
+    # print(result)
+    print("graph name: ", graph )
+    print()
+
