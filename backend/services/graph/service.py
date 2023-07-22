@@ -5,13 +5,14 @@ import os
 import pandas as pd
 import requests
 import sys
+
 sys.path.append('../')
 
 from backend.config import GRAPH_API_KEY
 from backend.services.graph.subgraphs import SubgraphService
 DEFAULT_PROTOCOL = "aave-forks"
 DEFAULT_CHAIN = "ethereum"
-
+from backend.database.send_data import DbService
 CHAINS = [
     "arbitrum",
     "aurora",
@@ -66,7 +67,7 @@ class GraphService:
     def __init__(self, protocol=DEFAULT_PROTOCOL, chain=DEFAULT_CHAIN):
         print('protocol', protocol)
         print('DEFAULT CHAIN', chain)
-        os.chdir('..')
+        # os.chdir('..')
         print("This is the path error",sys.path)
         self.build_subgraphs_json()
         print('after build_subgraphs_json')
@@ -143,7 +144,7 @@ class GraphService:
         )
         return df
 
-print(os.getcwdb().decode("utf-8"))
+print('adding path', os.getcwdb().decode("utf-8"))
 query = """{
   tokens(first: 5) {
     id
@@ -187,7 +188,7 @@ query1 = """{
 
 query_liquidity = """
 {
-  liquidityPools {
+  liquidityPools(orderBy: createdTimestamp, orderDirection: desc) {
     createdTimestamp
     createdBlockNumber
     name
@@ -199,15 +200,49 @@ query_liquidity = """
 }"""
 # graphs =['uniswap-v3', 'pancakeswap-v3', 'sushiswap', 'trader-joe']
 # print('graph', 'sushiswap')
+# def flatten_json(y):
+#     out = {}
 
+#     def flatten(x, name=''):
+#         if type(x) is dict:
+#             for a in x:
+#                 flatten(x[a], name + a + '_')
+#         elif type(x) is list:
+#             i = 0
+#             for a in x:
+#                 flatten(a, name + str(i) + '_')
+#                 i += 1
+#         else:
+#             out[name[:-1]] = x
+
+#     flatten(y)
+#     return out
+protocol = 'sushiswap'
 graph_service = GraphService(protocol = 'sushiswap', chain='ethereum')
 print('after graph_service')
 result = graph_service.query_thegraph(query_liquidity)
+print('result.type', isinstance(result, list))
+# for json_blob in result:
+#     # Convert JSON blob to Python dictionary and flatten it
+#     data_to_insert = flatten_json(json.loads(json_blob))
+# data = json.loads(result)
+# print('data: ')
+# print()
+df=pd.DataFrame(result)
+print('df', df.columns)
+df.rename(columns={'id': 'contractAddress'}, inplace=True)
+#add column for where data is from 
+df['source']=protocol
+
+# df.to_csv('sample_sushiswap.csv')
+data_to_send = DbService.insert_data(df, 'raw_graph_data_dex')
+# data_to_send.insert_data(df)
+
 print()
-graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
-print('after graph_service')
-result = graph_service.query_thegraph(query_liquidity)
-print()
+# graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
+# print('after graph_service')
+# result = graph_service.query_thegraph(query_liquidity)
+# print()
 
 # for graph in graphs:
 #     print('graph', graph)

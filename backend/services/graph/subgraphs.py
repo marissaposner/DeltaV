@@ -2,15 +2,16 @@ import glob
 import json
 import os
 import yaml
-
+import sys
 class SubgraphService:
     def __init__(self, protocol, chain):
         self.protocol = protocol
         self.chain = chain
-    
+        # sys.path.append('../')
         self.deployments = json.load(
                 open(os.getcwdb().decode("utf-8") + "/subgraphs/deployment/deployment.json")
             )[protocol]
+        
         
         try:
             # see if deployed on given chain
@@ -59,7 +60,6 @@ class SubgraphService:
         )
 
     def read_mappings_dir(self, directory):
-        print(list(glob.iglob(f"{directory}/**/*.ts", recursive=True)))
         return list(glob.iglob(f"{directory}/**/*.ts", recursive=True))
 
     def parse_template_file(self):
@@ -69,3 +69,5 @@ class SubgraphService:
         print(yaml_content)
 
     
+
+
