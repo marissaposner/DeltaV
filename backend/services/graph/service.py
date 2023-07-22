@@ -188,7 +188,7 @@ query1 = """{
 
 query_liquidity = """
 {
-  liquidityPools {
+  liquidityPools(orderBy: createdTimestamp, orderDirection: desc) {
     createdTimestamp
     createdBlockNumber
     name
@@ -232,10 +232,10 @@ df=pd.DataFrame(result)
 print('df', df.columns)
 df.rename(columns={'id': 'contractAddress'}, inplace=True)
 #add column for where data is from 
-df['source']='protocol'
+df['source']=protocol
 
 # df.to_csv('sample_sushiswap.csv')
-data_to_send = DbService.insert_data(df)
+data_to_send = DbService.insert_data(df, 'raw_graph_data_dex')
 # data_to_send.insert_data(df)
 
 print()
