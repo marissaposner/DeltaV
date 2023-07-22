@@ -13,6 +13,7 @@
   ```
 */
 import { MetaMaskSDK } from "@metamask/sdk";
+import MetaMaskImage from "~/images/metamask.svg";
 
 export default function Login() {
   const connectWallet = (e) => {
@@ -44,20 +45,25 @@ export default function Login() {
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
             <p className="font-martel text-4xl">Connectr</p>
-            <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">
-              Connect your MetaMask Wallet
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-gray-500">
-              You don't own a MetaMask Wallet?{" "}
-              <a
-                href="https://metamask.io/download/"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
-              >
-                Create one
-              </a>
-            </p>
+            <div className="flex justify-between items-center mt-8">
+              <img src={MetaMaskImage} width={70} height={100} alt="MetaMask" />
+              <div>
+                <h2 className="text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                  Connect MetaMask Wallet
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  You don't own a MetaMask Wallet?{" "}
+                  <a
+                    href="https://metamask.io/download/"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                  >
+                    Create one
+                  </a>
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-10">
