@@ -7,6 +7,7 @@ class SubgraphService:
     def __init__(self, protocol, chain):
         self.protocol = protocol
         self.chain = chain
+    
         self.deployments = json.load(
                 open(os.getcwdb().decode("utf-8") + "/subgraphs/deployment/deployment.json")
             )[protocol]
@@ -22,7 +23,9 @@ class SubgraphService:
             in self.deployments["deployments"][f"{protocol}-{chain}"]["services"]
         ):
             self.service_type = "decentralized-network"
-            # uniswap-v3 decentralised api keeps timing out??
+            # # uniswap-v3 decentralised api keeps timing out??
+            # if protocol == "uniswap-v3":
+            #     self.service_type = "hosted-service"
             
         elif (
             "hosted-service"
@@ -56,6 +59,7 @@ class SubgraphService:
         )
 
     def read_mappings_dir(self, directory):
+        print(list(glob.iglob(f"{directory}/**/*.ts", recursive=True)))
         return list(glob.iglob(f"{directory}/**/*.ts", recursive=True))
 
     def parse_template_file(self):
@@ -63,3 +67,5 @@ class SubgraphService:
         with open(self.template_file_location, "r") as stream:
             yaml_content = yaml.safe_load(stream)
         print(yaml_content)
+
+    
