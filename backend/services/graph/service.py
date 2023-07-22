@@ -67,6 +67,7 @@ class GraphService:
         print('protocol', protocol)
         print('DEFAULT CHAIN', chain)
         os.chdir('..')
+        print("This is the path error",sys.path)
         self.build_subgraphs_json()
         print('after build_subgraphs_json')
         self.subgraph = SubgraphService(protocol, chain)
@@ -108,20 +109,21 @@ class GraphService:
         )
         li = []
         for protocol in deployments:
-            for chain in CHAINS:
-                try:
-                    df = pd.DataFrame([SubgraphService(protocol, chain).__dict__])
-                    df.pop("protocol")
-                    df = df.join(df["deployments"].apply(pd.Series), lsuffix="_")
-                    df.pop("deployments_")
-                    df["deployments"].iloc[0] = (
-                        df["deployments"]
-                        .apply(pd.Series)[f"{protocol}-{chain}"]
-                        .iloc[0]
-                    )
-                    li.append(df)
-                except NotImplementedError:
-                    pass
+            # for chain in CHAINS:
+            print('in protocol')
+            try:
+                df = pd.DataFrame([SubgraphService(protocol, 'ethereum').__dict__])
+                df.pop("protocol")
+                df = df.join(df["deployments"].apply(pd.Series), lsuffix="_")
+                df.pop("deployments_")
+                df["deployments"].iloc[0] = (
+                    df["deployments"]
+                    .apply(pd.Series)[f"{protocol}-{'ethereum'}"]
+                    .iloc[0]
+                )
+                li.append(df)
+            except NotImplementedError:
+                pass
         df = pd.concat(li)
         df = df.set_index(["protocol", "chain"])
         json_dump = df.to_json(
@@ -195,14 +197,25 @@ query_liquidity = """
     cumulativeVolumeUSD
   }
 }"""
-graphs =['pancakeswap-v3-ethereum', 'sushiswap', 'trader-joe']
-for graph in graphs:
-    print('graph', graph)
-    graph_service = GraphService(protocol = graph, chain='arbitrum')
-    print('after graph_service')
-    result = graph_service.query_thegraph(query_liquidity)
-    print()
-    # print(result)
-    print("graph name: ", graph )
-    print()
+# graphs =['uniswap-v3', 'pancakeswap-v3', 'sushiswap', 'trader-joe']
+# print('graph', 'sushiswap')
+
+graph_service = GraphService(protocol = 'sushiswap', chain='ethereum')
+print('after graph_service')
+result = graph_service.query_thegraph(query_liquidity)
+print()
+graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
+print('after graph_service')
+result = graph_service.query_thegraph(query_liquidity)
+print()
+
+# for graph in graphs:
+#     print('graph', graph)
+#     graph_service = GraphService(protocol = 'graph', chain='ethereum')
+#     print('after graph_service')
+#     result = graph_service.query_thegraph(query_liquidity)
+#     print()
+#     # print(result)
+#     print("graph name: ", graph )
+#     print()
 
