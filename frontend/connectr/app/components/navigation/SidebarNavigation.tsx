@@ -12,7 +12,7 @@ export default function SidebarNavigation() {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-12 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
-            <p className="font-martel text-xl">Connectr</p>
+            <p className="font-martel text-xl">DeltaV</p>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-36">

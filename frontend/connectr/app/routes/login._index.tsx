@@ -21,8 +21,8 @@ export default function Login() {
       // injectProvider: true,
       // communicationLayerPreference: "webrtc",
       dappMetadata: {
-        name: "Connectr",
-        url: "https://connectr.com",
+        name: "DeltaV",
+        url: "https://deltav.io",
       },
     });
 
@@ -44,7 +44,7 @@ export default function Login() {
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <p className="font-martel text-4xl">Connectr</p>
+            <p className="font-martel text-4xl">DeltaV</p>
             <div className="flex justify-between items-center mt-8">
               <img src={MetaMaskImage} width={70} height={100} alt="MetaMask" />
               <div>

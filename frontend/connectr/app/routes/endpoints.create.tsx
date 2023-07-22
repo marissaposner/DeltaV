@@ -7,7 +7,7 @@ import { requireAuth } from "~/services/auth.server";
 
 export const meta: V2_MetaFunction = () => {
   return [
-    { title: "Connectr" },
+    { title: "DeltaV" },
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
