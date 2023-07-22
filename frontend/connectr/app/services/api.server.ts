@@ -94,3 +94,12 @@ export async function createUser(account: string) {
         userAddress: account
     })
 }
+
+export async function fetchEthABI(account: string) {
+    return await makeAPIRequest('https://api.etherscan.io/api', null, {
+        address: account,
+        module: 'contract',
+        action: 'getabi',
+        apikey: process.env.API_KEY_ETHERSCAN
+    }, true)
+}

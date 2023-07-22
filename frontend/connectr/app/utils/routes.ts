@@ -7,4 +7,5 @@ export enum AppRouting {
     LOGOUT = '/logout',
     API_LOGIN = '/api/login',
     API_LOGOUT = '/api/logout',
+    API_ABI = '/api/abi',
 }

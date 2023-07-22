@@ -52,7 +52,7 @@ export default function Select(props: SelectProps) {
       <input
         type="hidden"
         name={name}
-        value={selectedPerson ? selectedPerson.id : null}
+        value={selectedPerson ? selectedPerson.id : ""}
       />
       {label ? (
         <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
