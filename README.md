@@ -26,6 +26,4 @@ We created a submodule in our github repo to automatically update with the Messa
 
     
   - Setup .env by copying .env.example to .env and seed with correct data
-  - Setup the database with `flask db upgrade`
-  - Start the backend app with `flask run`
 - Visit http://localhost:5000
