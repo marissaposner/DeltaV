@@ -6,11 +6,9 @@ import {
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { classNames } from "~/utils/common";
+import { AppRouting } from "~/utils/routes";
 
-const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
-];
+const userNavigation = [{ name: "Disconnect", href: AppRouting.LOGOUT }];
 
 type HeaderProps = {
   setSidebarOpen: (param: boolean) => any;

@@ -3,12 +3,19 @@ import { Title } from "~/components/common/Title";
 import { useNavigate } from "@remix-run/react";
 import { AppRouting } from "~/utils/routes";
 import { classNames, getColours, getRandomArbitrary } from "~/utils/common";
+import { requireAuth } from "~/services/auth.server";
 
 export const meta: V2_MetaFunction = () => {
   return [
     { title: "Connectr" },
     { name: "description", content: "Welcome to Remix!" },
   ];
+};
+
+export const loader = async ({ request }) => {
+  await requireAuth({ request });
+
+  return null;
 };
 
 export default function EndpointsIndex() {
