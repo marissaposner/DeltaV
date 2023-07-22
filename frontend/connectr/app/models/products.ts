@@ -1,13 +1,3 @@
-export enum ActionTypeEnum {
-  TRANSFER = "TRANSFER",
-}
-
-export enum OperatorEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  EQUALS = "EQUALS",
-}
-
 export enum SourceEnum {
   ETHERSCAN = "ETHERSCAN",
   DEFI_LLAMA = "DEFI_LLAMA",
@@ -24,20 +14,20 @@ export enum ProductTypeEnum {
 // DEX DETAILS
 
 export enum DexProductEnum {
-  BALANCER = "BALANCER",
+  // BALANCER = "BALANCER",
   CURVE = "CURVE",
-  PANCAKESWAP = "PANCAKESWAP",
+  // PANCAKESWAP = "PANCAKESWAP",
   SUSHISWAP = "SUSHISWAP",
-  UNISWAP_V2 = "UNISWAP_V2",
+  // UNISWAP_V2 = "UNISWAP_V2",
   UNISWAP_V3 = "UNISWAP_V3",
 }
 
 export const DexProductNames = {
-  [DexProductEnum.BALANCER]: "Balancer",
+  // [DexProductEnum.BALANCER]: "Balancer",
   [DexProductEnum.CURVE]: "Curve",
-  [DexProductEnum.PANCAKESWAP]: "Pancake Swap",
+  // [DexProductEnum.PANCAKESWAP]: "Pancake Swap",
   [DexProductEnum.SUSHISWAP]: "Sushi Swap",
-  [DexProductEnum.UNISWAP_V2]: "Uniswap V2",
+  // [DexProductEnum.UNISWAP_V2]: "Uniswap V2",
   [DexProductEnum.UNISWAP_V3]: "Uniswap V3",
 };
 
@@ -165,12 +155,41 @@ export const TokenProductNames = {
 
 export enum TokenFieldEnum {
   PRICE = "PRICE",
-  CIRCULATING_TOKEN_VOLUME = "CIRCULATING_TOKEN_VOLUME",
+  TOKEN_VOLUME = "TOKEN_VOLUME",
   COUNT_TRANSACTIONS = "COUNT_TRANSACTIONS",
 }
 
 export const TokenFieldNames = {
   [TokenFieldEnum.PRICE]: "Price",
-  [TokenFieldEnum.CIRCULATING_TOKEN_VOLUME]: "Amount of tokens in circulation",
+  [TokenFieldEnum.TOKEN_VOLUME]: "Nominal token volume",
   [TokenFieldEnum.COUNT_TRANSACTIONS]: "Transaction count",
 };
+
+export enum ActionTypeEnum {
+  SWAP = "SWAP",
+  TRANSFER = "TRANSFER",
+}
+
+export interface ISwap {
+  amount: string;
+  tokenIn: TokenProductEnum;
+  tokenOut: TokenProductEnum;
+}
+
+export interface ITransfer {
+  amount: string;
+  token: TokenProductEnum;
+}
+
+export const checkActionTypePayload = {
+  [ActionTypeEnum.SWAP]: (obj: any): obj is ISwap =>
+    "type" in obj && obj.type === "ISwap",
+  [ActionTypeEnum.TRANSFER]: (obj: any): obj is ITransfer =>
+    "type" in obj && obj.type === "ITransfer",
+};
+
+export enum OperatorEnum {
+  GREATER_THAN = "GREATER_THAN",
+  LESS_THAN = "LESS_THAN",
+  EQUALS = "EQUALS",
+}

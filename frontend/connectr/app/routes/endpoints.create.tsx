@@ -1,5 +1,5 @@
 import type { ActionArgs, V2_MetaFunction } from "@remix-run/node";
-import { Form, useFetcher } from "@remix-run/react";
+import { Form, useFetcher, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
@@ -16,7 +16,12 @@ import {
 } from "~/models/products";
 import { createEndpoint } from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
-import { convertObjectToNameValue } from "~/utils/common";
+import {
+  classNames,
+  convertObjectToNameValue,
+  replacer,
+  reviver,
+} from "~/utils/common";
 import { AppRouting } from "~/utils/routes";
 import LoaderSvg from "~/images/loader.svg";
 import SwitchGroupButton from "~/components/switches/SwitchGroupButton";
@@ -36,21 +41,51 @@ export const loader = async ({ request }) => {
 
 export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
-  const name = form.get("name");
-  const options = form.get("options");
-  const attributes = form.get("attributes");
-  const fields = form.get("fields");
+  const body = form.get("body");
 
-  const token = await currentToken({ request });
-  const response = await createEndpoint(token, {
-    name,
-    options,
-    attributes,
-    fields,
-  });
+  if (body) {
+    const json = JSON.parse(body, reviver);
+
+    if (json.products && json.name && json.products.size > 0) {
+      let productsJSON = [];
+      const token = await currentToken({ request });
+
+      json.products.forEach((value, key) => {
+        if (value && Array.isArray(value) && value.length > 0) {
+          value.forEach((v, k) => {
+            if (v.enabled) {
+              productsJSON.push({
+                fieldNameEnum: v.value,
+                productNameEnum: key,
+              });
+            }
+          });
+        }
+      });
+
+      if (productsJSON.length > 0) {
+        const response = await createEndpoint(
+          json.contractAddress && json.contractAddress.length > 0
+            ? json.contractAddress
+            : token,
+          JSON.stringify({
+            name: json.name,
+            fieldsToCreate: productsJSON,
+          })
+        );
+
+        console.log(productsJSON);
+        console.log(response);
+
+        return {
+          status: true,
+        };
+      }
+    }
+  }
 
   return {
-    status: true,
+    status: false,
   };
 };
 
@@ -59,9 +94,12 @@ export default function CreateEndpoint() {
   const dex = convertObjectToNameValue(DexProductNames);
   const lending = convertObjectToNameValue(LendingProductNames);
 
+  const submit = useSubmit();
   const abiFetcher = useFetcher();
+
   const [name, setName] = useState(null);
   const [contractAddress, setContractAddress] = useState(null);
+  const [showCustomContract, setShowCustomContract] = useState(false);
 
   const [abi, setABI] = useState("");
   const [currentProductSelected, setCurrentProductSelected] = useState({});
@@ -154,10 +192,28 @@ export default function CreateEndpoint() {
         className="mb-9"
         ctaTitle="Publish Endpoint"
         ctaType="submit"
+        ctaAction={(e) => {
+          e.preventDefault();
+
+          submit(
+            {
+              body: JSON.stringify(
+                {
+                  products: selectedProducts,
+                  name,
+                  // contractAddress,
+                  // abi,
+                },
+                replacer
+              ),
+            },
+            { method: "post" }
+          );
+        }}
       />
       <div className="bg-white shadow-standard px-12 py-9 mb-4">
-        <div className="flex justify-between max-w-6xl">
-          <div className="sm:col-span-3 basis-1/2 mr-4">
+        <div className="max-w-6xl">
+          <div className="sm:col-span-3">
             <label
               htmlFor="first-name"
               className="block text-sm font-bold leading-6 text-gray-900"
@@ -171,53 +227,6 @@ export default function CreateEndpoint() {
                 clickEvent={(e) => setName(e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="sm:col-span-3 basis-1/2">
-            <label
-              htmlFor="contractAddress"
-              className="block text-sm font-bold leading-6 text-gray-900"
-            >
-              Contract Address
-            </label>
-            <div className="mt-2">
-              <InputText
-                name="contractAddress"
-                placeholder="Enter a contract address"
-                clickEvent={(e) => {
-                  if (e.target.value.length == 42)
-                    abiFetcher.submit(
-                      { account: e.target.value },
-                      { method: "post", action: AppRouting.API_ABI }
-                    );
-
-                  setContractAddress(e.target.value);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="sm:col-span-4 mt-4 max-w-6xl">
-          <label
-            htmlFor="ABI"
-            className="text-sm font-bold leading-6 text-gray-900 flex items-center"
-          >
-            <span className="mr-2">ABI </span>
-            {abiFetcher.state != "idle" ? (
-              <span>
-                <img src={LoaderSvg} width={20} alt="loader" />
-              </span>
-            ) : null}
-          </label>
-          <div className="mt-2">
-            <InputTextArea
-              name="abi"
-              placeholder="Enter a contract address to pull the ABI automatically"
-              readOnly={true}
-              rows={8}
-              value={abi}
-            />
           </div>
         </div>
       </div>
@@ -260,11 +269,67 @@ export default function CreateEndpoint() {
           <h2 className="mb-4 font-bold">Custom Contract</h2>
 
           <button
+            onClick={(e) => {
+              e.preventDefault();
+
+              setShowCustomContract(!showCustomContract);
+            }}
             type="button"
             className="rounded-md bg-indigo-50 px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100"
           >
-            Add Custom Contract
+            {showCustomContract
+              ? "Hide Custom Contract"
+              : "Show Custom Contract"}
           </button>
+
+          <div className={classNames(showCustomContract ? "block" : "hidden")}>
+            <div className="sm:col-span-4 mt-4">
+              <label
+                htmlFor="contractAddress"
+                className="block text-sm font-bold leading-6 text-gray-900"
+              >
+                Contract Address
+              </label>
+              <div className="mt-2">
+                <InputText
+                  name="contractAddress"
+                  placeholder="Enter a contract address"
+                  clickEvent={(e) => {
+                    if (e.target.value.length == 42)
+                      abiFetcher.submit(
+                        { account: e.target.value },
+                        { method: "post", action: AppRouting.API_ABI }
+                      );
+
+                    setContractAddress(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-4 mt-4">
+              <label
+                htmlFor="ABI"
+                className="text-sm font-bold leading-6 text-gray-900 flex items-center"
+              >
+                <span className="mr-2">ABI </span>
+                {abiFetcher.state != "idle" ? (
+                  <span>
+                    <img src={LoaderSvg} width={20} alt="loader" />
+                  </span>
+                ) : null}
+              </label>
+              <div className="mt-2">
+                <InputTextArea
+                  name="abi"
+                  placeholder="Enter a contract address to pull the ABI automatically"
+                  readOnly={true}
+                  rows={15}
+                  value={abi}
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">

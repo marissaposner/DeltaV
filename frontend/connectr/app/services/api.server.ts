@@ -47,9 +47,6 @@ async function makeAPIRequest(
     if (!data) data = {}
 
     let response
-    // const headers = {
-    //     Authorization: 'Bearer ' + session.get('userToken'),
-    // }
 
     try {
         if (!getRequest) response = await axios.post(url, data, { headers })
@@ -78,19 +75,20 @@ async function makeAPIRequest(
 
 export async function getEndpoints(account: string, data? : object) {
     
-     return await makeAPIRequest(getAPIBaseURL() + 'endpoint', {
+     return await makeAPIRequest(getAPIBaseURL() + 'endpoints', {
         user_id: account
      }, data, true)
 }
 
-export async function createEndpoint(account: string, data? : object) {
-    return await makeAPIRequest(getAPIBaseURL() + 'endpoint', {
-       user_id: account
+export async function createEndpoint(account: string, data? : string) {
+    return await makeAPIRequest(getAPIBaseURL() + 'endpoints', {
+       user_id: account,
+       'Content-Type': 'application/json',
     }, data)
 }
 
 export async function createUser(account: string) {
-    return await makeAPIRequest(getAPIBaseURL() + 'user', null, {
+    return await makeAPIRequest(getAPIBaseURL() + 'users', null, {
         userAddress: account
     })
 }

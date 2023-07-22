@@ -2,9 +2,10 @@ import type { V2_MetaFunction } from "@remix-run/node";
 import { Title } from "~/components/common/Title";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { AppRouting } from "~/utils/routes";
-import { classNames, getColours, getRandomArbitrary } from "~/utils/common";
+import { classNames, getColours } from "~/utils/common";
 import { currentToken, requireAuth } from "~/services/auth.server";
 import { getEndpoints } from "~/services/api.server";
+import { format, parseISO } from "date-fns";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -18,6 +19,8 @@ export const loader = async ({ request }) => {
 
   const token = await currentToken({ request });
 
+  console.log(token);
+
   return {
     endpoints: await getEndpoints(token),
   };
@@ -27,31 +30,14 @@ export default function EndpointsIndex() {
   const navigate = useNavigate();
   const { endpoints } = useLoaderData();
 
-  console.log(endpoints);
-
   const statuses = {
     Running: "text-green-400 bg-green-400/10",
     Error: "text-rose-400 bg-rose-400/10",
   };
 
-  const colours = getColours();
+  console.log(endpoints.data.endpoints);
 
-  // const endpoints = [
-  //   {
-  //     id: 1,
-  //     name: "Lindsay Walton",
-  //     title: "Front-end Developer",
-  //     sources: [
-  //       "Ethereum",
-  //       "CoinGecko API",
-  //       "Ethereum",
-  //       "CoinGecko API",
-  //       "Ethereum",
-  //     ],
-  //     status: "Running",
-  //     date: "25/04/2023",
-  //   },
-  // ];
+  const colours = getColours();
 
   return (
     <>
@@ -108,8 +94,9 @@ export default function EndpointsIndex() {
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {endpoints &&
-                  Array.isArray(endpoints) &&
-                  endpoints.map((endpoint) => (
+                  endpoints.data?.endpoints &&
+                  Array.isArray(endpoints.data.endpoints) &&
+                  endpoints.data.endpoints.map((endpoint) => (
                     <tr key={endpoint.id} className="even:bg-gray-50">
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
                         #{endpoint.id}
@@ -118,10 +105,13 @@ export default function EndpointsIndex() {
                         {endpoint.name}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {endpoint.date}
+                        {format(
+                          parseISO(endpoint.createdAt),
+                          "EEE do MMM HH:mm:ss"
+                        )}
                       </td>
                       <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500 flex flex-wrap max-w-[285px]">
-                        {endpoint.sources.map((source, index) => (
+                        {/* {endpoint.sources.map((source, index) => (
                           <span
                             key={index}
                             className={classNames(
@@ -135,7 +125,7 @@ export default function EndpointsIndex() {
                           >
                             {source}
                           </span>
-                        ))}
+                        ))} */}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <div className="flex items-center justify-end gap-x-2 sm:justify-start">
@@ -147,14 +137,14 @@ export default function EndpointsIndex() {
                           </time>
                           <div
                             className={classNames(
-                              statuses[endpoint.status],
+                              statuses["Running"],
                               "flex-none rounded-full p-1"
                             )}
                           >
                             <div className="h-1.5 w-1.5 rounded-full bg-current" />
                           </div>
                           <div className="hidden text-gray-500 sm:block">
-                            {endpoint.status}
+                            Running
                           </div>
                         </div>
                       </td>
