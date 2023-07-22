@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 /*
   This example requires some changes to your config:
   
@@ -15,10 +17,29 @@
 interface MultipleListProps {
   options: Array<object>;
   className: string;
+  clickEvent?: (event: any) => any;
 }
 
 export default function MultipleList(props: MultipleListProps) {
-  const { options, className } = props;
+  const { options, className, clickEvent } = props;
+  const [checkedItems, setCheckedItems] = useState(new Set());
+
+  const handleCheckChange = (event) => {
+    const itemId = event.target.value;
+    const newCheckedItems = new Set(checkedItems);
+
+    if (checkedItems.has(itemId)) {
+      newCheckedItems.delete(itemId);
+    } else {
+      newCheckedItems.add(itemId);
+    }
+
+    setCheckedItems(newCheckedItems);
+  };
+
+  useEffect(() => {
+    if (clickEvent) clickEvent(checkedItems);
+  }, [checkedItems, clickEvent]);
 
   return (
     <fieldset className={className}>
@@ -35,6 +56,8 @@ export default function MultipleList(props: MultipleListProps) {
                     type="checkbox"
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value={item.value}
+                    checked={checkedItems.has(item.value)}
+                    onChange={handleCheckChange}
                   />
                 </div>
                 <div className="ml-3 text-sm leading-6">

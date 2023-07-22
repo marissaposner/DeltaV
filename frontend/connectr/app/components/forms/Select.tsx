@@ -21,10 +21,11 @@ interface SelectProps {
   options: Array<object>;
   label?: string;
   className?: string;
+  clickEvent?: (event: any) => any;
 }
 
 export default function Select(props: SelectProps) {
-  const { options, label, className } = props;
+  const { options, label, className, clickEvent } = props;
 
   const [query, setQuery] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -40,7 +41,11 @@ export default function Select(props: SelectProps) {
     <Combobox
       as="div"
       value={selectedPerson}
-      onChange={setSelectedPerson}
+      onChange={(e) => {
+        setSelectedPerson(e);
+
+        if (clickEvent) clickEvent(e);
+      }}
       className={className}
     >
       {label ? (
