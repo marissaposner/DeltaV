@@ -198,6 +198,52 @@ query_liquidity = """
     cumulativeVolumeUSD
   }
 }"""
+
+query_uniswap_pools = """{
+  markets {
+    inputToken {
+        name
+        id
+        symbol
+      }
+      outputToken {
+        name
+        symbol
+        id
+      }
+    hourlySnapshots (first: 1000000, orderBy: blockNumber, orderDirection: desc) {
+    totalValueLockedUSD
+    timestamp
+  }
+}
+}"""
+
+query_aave="""{
+  markets(where: {inputToken_: {symbol: "WETH"}}) {
+    id
+    inputToken {
+      name
+      symbol
+      id
+    }
+    outputToken {
+      name
+      id
+      symbol
+    }
+  }
+  marketHourlySnapshots {
+    id
+    blockNumber
+    timestamp
+    rates {
+      rate
+      side
+      duration
+    }
+  }
+}"""
+
 # graphs =['uniswap-v3', 'pancakeswap-v3', 'sushiswap', 'trader-joe']
 # print('graph', 'sushiswap')
 # def flatten_json(y):
@@ -217,8 +263,8 @@ query_liquidity = """
 
 #     flatten(y)
 #     return out
-protocol = 'sushiswap'
-graph_service = GraphService(protocol = 'sushiswap', chain='ethereum')
+protocol = 'uniswap-v3'
+graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
 print('after graph_service')
 result = graph_service.query_thegraph(query_liquidity)
 print('result.type', isinstance(result, list))
@@ -229,18 +275,27 @@ print('result.type', isinstance(result, list))
 # print('data: ')
 # print()
 df=pd.DataFrame(result)
-print('df', df.columns)
 df.rename(columns={'id': 'contractAddress'}, inplace=True)
+#lowercase columns from the graph for postgres
+# df.columns = map(str.lower, df.columns)
+
+
 #add column for where data is from 
 df['source']=protocol
+table_structure="""id SERIAL PRIMARY KEY,
+    createdtimestamp VARCHAR(255),
+    createdblocknumber TEXT,
+    name TEXT,
+    symbol TEXT,
+    totalvaluelockedusd VARCHAR(255),
+    cumulativevolumeusd VARCHAR(255),
+    contractaddress VARCHAR(255),
+    source VARCHAR(255)"""
 
-# df.to_csv('sample_sushiswap.csv')
-data_to_send = DbService.insert_data(df, 'raw_graph_data_dex')
-# data_to_send.insert_data(df)
+data_to_send = DbService.insert_data(df, 'raw_graph_data_dex_2',table_structure)
 
 print()
 # graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
-# print('after graph_service')
 # result = graph_service.query_thegraph(query_liquidity)
 # print()
 
