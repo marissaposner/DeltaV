@@ -1,8 +1,6 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
-import {
-    getAPIBaseURL,
-} from './api.server'
 import { AppRouting } from '~/utils/routes'
+import { createUser } from './api.server'
 
 let storage = createCookieSessionStorage({
     cookie: {
@@ -26,6 +24,15 @@ async function getUserSession(request: Request) {
 export async function login({ request, account }) {
     let session = await getUserSession(request)
     session.set('userToken', account)
+
+    //call external API and create user
+    try {
+        await createUser(account)
+        // console.log(response)
+    }
+    catch(message) {
+        console.log(message)
+    }
 
     return {
         status: true,

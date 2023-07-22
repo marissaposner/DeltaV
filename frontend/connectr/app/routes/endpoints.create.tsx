@@ -1,9 +1,12 @@
-import type { V2_MetaFunction } from "@remix-run/node";
-import { useEffect, useState } from "react";
+import type { ActionArgs, V2_MetaFunction } from "@remix-run/node";
+import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { useEffect, useRef, useState } from "react";
 import { Title } from "~/components/common/Title";
+import InputText from "~/components/forms/InputText";
 import MultipleList from "~/components/forms/MultipleList";
 import Select from "~/components/forms/Select";
-import { requireAuth } from "~/services/auth.server";
+import { createEndpoint, getAPIBaseURL } from "~/services/api.server";
+import { currentToken, requireAuth } from "~/services/auth.server";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -16,6 +19,26 @@ export const loader = async ({ request }) => {
   await requireAuth({ request });
 
   return null;
+};
+
+export const action = async ({ request }: ActionArgs) => {
+  const form = await request.formData();
+  const name = form.get("name");
+  const options = form.get("options");
+  const attributes = form.get("attributes");
+  const fields = form.get("fields");
+
+  const token = await currentToken({ request });
+  const response = await createEndpoint(token, {
+    name,
+    options,
+    attributes,
+    fields,
+  });
+
+  return {
+    status: true,
+  };
 };
 
 export default function CreateEndpoint() {
@@ -34,6 +57,8 @@ export default function CreateEndpoint() {
   ];
   const attributes = [];
   const fields = [];
+
+  const [name, setName] = useState(null);
   const [defiOption, setDefiOption] = useState(null);
   const [secondaryDefiOption, setSecondaryDefiOption] = useState(null);
   const [selectedTokens, setSelectedTokens] = useState(new Set());
@@ -41,6 +66,7 @@ export default function CreateEndpoint() {
   const [selectedFields, setSelectedFields] = useState(new Set());
 
   useEffect(() => {
+    console.log("Name changed", name);
     console.log("Checked items in selectedTokens:", Array.from(selectedTokens));
     console.log(
       "Checked items in selectedAttributes:",
@@ -50,6 +76,7 @@ export default function CreateEndpoint() {
     console.log("Checked items in secondaryDefiOption:", defiOption);
     console.log("Checked items in defiOption:", secondaryDefiOption);
   }, [
+    name,
     selectedTokens,
     defiOption,
     secondaryDefiOption,
@@ -58,22 +85,33 @@ export default function CreateEndpoint() {
   ]);
 
   return (
-    <>
+    <Form method="post">
       <Title
         title="Create Endpoint"
         className="mb-9"
         ctaTitle="Publish Endpoint"
+        ctaType="submit"
       />
+      <div className="bg-white shadow-standard px-12 py-9 mb-4">
+        <h2 className="mb-4 font-bold">Name</h2>
+        <InputText
+          placeholder="Friendly name"
+          name="name"
+          clickEvent={(e) => setName(e.target.value)}
+        />
+      </div>
 
       <div className="flex justify-between">
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">Defi</h2>
           <Select
+            name="defiOptions"
             options={defiOptions}
             className="mb-2"
             clickEvent={setDefiOption}
           />
           <Select
+            name="defiOptionsSecondary"
             options={defiOptionsSecondary}
             className="mb-8"
             clickEvent={setSecondaryDefiOption}
@@ -83,6 +121,7 @@ export default function CreateEndpoint() {
 
           <MultipleList
             options={tokens}
+            name="tokens"
             className="mb-8"
             clickEvent={setSelectedTokens}
           />
@@ -99,6 +138,7 @@ export default function CreateEndpoint() {
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">Attributes</h2>
           <MultipleList
+            name="attributes"
             options={attributes}
             className="mb-8"
             clickEvent={setSelectedAttributes}
@@ -107,12 +147,13 @@ export default function CreateEndpoint() {
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">Fields</h2>
           <MultipleList
+            name="fields"
             options={fields}
             className="mb-8"
             clickEvent={setSelectedFields}
           />
         </div>
       </div>
-    </>
+    </Form>
   );
 }

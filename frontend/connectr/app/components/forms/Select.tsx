@@ -20,12 +20,13 @@ import { classNames } from "~/utils/common";
 interface SelectProps {
   options: Array<object>;
   label?: string;
+  name: string;
   className?: string;
   clickEvent?: (event: any) => any;
 }
 
 export default function Select(props: SelectProps) {
-  const { options, label, className, clickEvent } = props;
+  const { options, label, className, clickEvent, name } = props;
 
   const [query, setQuery] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -48,6 +49,11 @@ export default function Select(props: SelectProps) {
       }}
       className={className}
     >
+      <input
+        type="hidden"
+        name={name}
+        value={selectedPerson ? selectedPerson.id : null}
+      />
       {label ? (
         <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
           {label}

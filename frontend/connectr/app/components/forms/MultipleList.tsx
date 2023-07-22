@@ -16,12 +16,13 @@ import { useEffect, useState } from "react";
 */
 interface MultipleListProps {
   options: Array<object>;
+  name: string;
   className: string;
   clickEvent?: (event: any) => any;
 }
 
 export default function MultipleList(props: MultipleListProps) {
-  const { options, className, clickEvent } = props;
+  const { options, className, clickEvent, name } = props;
   const [checkedItems, setCheckedItems] = useState(new Set());
 
   const handleCheckChange = (event) => {
@@ -52,7 +53,7 @@ export default function MultipleList(props: MultipleListProps) {
                   <input
                     id={"listItem" + index}
                     aria-describedby="comments-description"
-                    name="options"
+                    name={name}
                     type="checkbox"
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value={item.value}

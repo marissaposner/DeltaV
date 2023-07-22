@@ -4,11 +4,12 @@ interface TitleProps {
   title: string;
   className: string;
   ctaTitle?: string;
+  ctaType?: string;
   ctaAction?: (param: any) => any;
 }
 
 export function Title(props: TitleProps) {
-  const { title, className, ctaAction, ctaTitle } = props;
+  const { title, className, ctaAction, ctaTitle, ctaType } = props;
 
   return (
     <>
@@ -27,7 +28,7 @@ export function Title(props: TitleProps) {
           <div className="mt-4 flex md:ml-4 md:mt-0">
             <button
               onClick={ctaAction}
-              type="button"
+              type={ctaType ? ctaType : "button"}
               className="ml-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {ctaTitle}
