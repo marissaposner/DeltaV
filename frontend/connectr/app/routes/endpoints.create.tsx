@@ -11,6 +11,7 @@ import {
   DexProductNames,
   LendingFieldNames,
   LendingProductNames,
+  TokenFieldNames,
   TokenProductNames,
 } from "~/models/products";
 import { createEndpoint } from "~/services/api.server";
@@ -61,10 +62,12 @@ export default function CreateEndpoint() {
   const abiFetcher = useFetcher();
   const [name, setName] = useState(null);
   const [contractAddress, setContractAddress] = useState(null);
+
   const [abi, setABI] = useState("");
   const [currentProductSelected, setCurrentProductSelected] = useState({});
-  const [selectedTokens, setSelectedTokens] = useState(new Set());
   const [selectedProducts, setSelectedProducts] = useState(new Map());
+
+  const [selectedTokens, setSelectedTokens] = useState(new Map());
   const [dexProducts, setDexProducts] = useState(new Map());
   const [lendingProducts, setLendingProducts] = useState(new Map());
 
@@ -82,59 +85,67 @@ export default function CreateEndpoint() {
     } else setABI("");
   }, [abiFetcher]);
 
-  const loadDexAttributes = (value) => {
-    const result = convertObjectToNameValue(DexFieldNames);
+  const loadAttributes = (value) => {
+    setAttributes(selectedProducts.get(value));
 
-    setAttributes(result);
+    let newName = "";
+
+    if (DexProductNames[value]) newName = DexProductNames[value];
+    else if (LendingProductNames[value]) newName = LendingProductNames[value];
+    else newName = TokenProductNames[value];
+
     setCurrentProductSelected({
-      name: DexProductNames[value],
-      value,
-    });
-
-    console.log(
-      DexProductNames[value],
-      value,
-      currentProductSelected,
-      selectedProducts
-    );
-  };
-
-  const loadLendingAttributes = (value) => {
-    const result = convertObjectToNameValue(LendingFieldNames);
-
-    setAttributes(result);
-    setCurrentProductSelected({
-      name: LendingProductNames[value],
+      name: newName,
       value,
     });
   };
 
-  const addAttributeToProduct = (value) => {
-    console.log(value, currentProductSelected, selectedProducts);
+  const enableAttribute = (value, enabled) => {
+    let newProducts = selectedProducts;
 
-    if (selectedProducts.has(currentProductSelected.value)) {
-      let newAttributes = selectedProducts.get(currentProductSelected.value);
+    if (newProducts.has(currentProductSelected.value)) {
+      let newValues = newProducts.get(currentProductSelected.value);
 
-      //check for value, if exists remove it, otherwise add it
-      const check = newAttributes.filter((filterValue) => {
-        return filterValue == value;
+      newValues.forEach((v, index) => {
+        if (newValues[index].value == value)
+          newValues[index].enabled = !enabled;
       });
 
-      if (check.length == 0) newAttributes.push(value);
-      else
-        newAttributes = newAttributes.filter((filterValue) => {
-          return filterValue != value;
-        });
-
-      selectedProducts.set(currentProductSelected.value, [
-        ...new Set(newAttributes),
-      ]);
+      newProducts.set(currentProductSelected.value, newValues);
     }
+
+    setSelectedProducts(newProducts);
   };
 
   useEffect(() => {
-    setSelectedProducts(new Map([...dexProducts, ...lendingProducts]));
-  }, [dexProducts, lendingProducts]);
+    const combinedMaps = new Map([
+      ...dexProducts,
+      ...lendingProducts,
+      ...selectedTokens,
+    ]);
+
+    combinedMaps.forEach((value, key, map) => {
+      let newValue = "";
+
+      if (DexProductNames[key])
+        newValue = convertObjectToNameValue(DexFieldNames);
+      else if (LendingProductNames[key])
+        newValue = convertObjectToNameValue(LendingFieldNames);
+      else if (TokenProductNames[key])
+        newValue = convertObjectToNameValue(TokenFieldNames);
+
+      map.set(
+        key,
+        selectedProducts.has(key) && selectedProducts.get(key).length > 0
+          ? selectedProducts.get(key)
+          : newValue
+      );
+    });
+
+    // console.log(combinedMaps);
+
+    setSelectedProducts(combinedMaps);
+  }, [dexProducts, lendingProducts, selectedTokens]);
 
   return (
     <Form method="post">
@@ -219,7 +230,7 @@ export default function CreateEndpoint() {
             options={dex}
             className="mb-4"
             clickEvent={setDexProducts}
-            clickIconEvent={loadDexAttributes}
+            clickIconEvent={loadAttributes}
             showIcon={true}
             hideValue={true}
           />
@@ -229,7 +240,7 @@ export default function CreateEndpoint() {
             options={lending}
             className="mb-8"
             clickEvent={setLendingProducts}
-            clickIconEvent={loadLendingAttributes}
+            clickIconEvent={loadAttributes}
             showIcon={true}
             hideValue={true}
           />
@@ -241,6 +252,9 @@ export default function CreateEndpoint() {
             name="tokens"
             className="mb-8"
             clickEvent={setSelectedTokens}
+            clickIconEvent={loadAttributes}
+            showIcon={true}
+            hideValue={false}
           />
           <hr className="mb-5" />
           <h2 className="mb-4 font-bold">Custom Contract</h2>
@@ -268,15 +282,8 @@ export default function CreateEndpoint() {
                     index
                   }
                   className="mb-4"
-                  clickEvent={addAttributeToProduct}
-                  enable={
-                    selectedProducts.has(currentProductSelected.value) &&
-                    selectedProducts
-                      .get(currentProductSelected.value)
-                      .includes(item.value)
-                      ? true
-                      : false
-                  }
+                  clickEvent={enableAttribute}
+                  enable={item.enabled}
                 />
               ))
             : null}

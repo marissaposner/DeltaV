@@ -39,7 +39,7 @@ export default function SwitchGroupButton({
         checked={enabled}
         onChange={(e) => {
           setEnabled(e);
-          clickEvent(item.value);
+          clickEvent(item.value, enabled);
         }}
         className={classNames(
           enabled ? "bg-indigo-600" : "bg-gray-200",

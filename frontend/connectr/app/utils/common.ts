@@ -23,7 +23,8 @@ export function convertObjectToNameValue(obj: object) {
   for (const key in obj) {
     result.push({
       name: obj[key],
-      value: key
+      value: key,
+      enabled: false,
     })
 }
   
