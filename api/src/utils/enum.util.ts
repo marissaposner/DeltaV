@@ -1,5 +1,7 @@
 export enum SourceEnum {
+  ETHERSCAN = "ETHERSCAN",
   DEFI_LLAMA = "DEFI_LLAMA",
+  SUBGRAPH = "SUBGRAPH",
 }
 
 // DEX DETAILS
@@ -9,15 +11,17 @@ export enum DexProductEnum {
   CURVE = "CURVE",
   PANCAKESWAP = "PANCAKESWAP",
   SUSHISWAP = "SUSHISWAP",
-  UNISWAP = "UNISWAP",
+  UNISWAP_V2 = "UNISWAP_V2",
+  UNISWAP_V3 = "UNISWAP_V3",
 }
 
 export const DexProductNames = {
   [DexProductEnum.BALANCER]: "Balancer",
-  [DexProductEnum.CURVE]: "Curbe",
+  [DexProductEnum.CURVE]: "Curve",
   [DexProductEnum.PANCAKESWAP]: "Pancake Swap",
   [DexProductEnum.SUSHISWAP]: "Sushi Swap",
-  [DexProductEnum.UNISWAP]: "Uniswap",
+  [DexProductEnum.UNISWAP_V2]: "Uniswap V2",
+  [DexProductEnum.UNISWAP_V3]: "Uniswap V3",
 };
 
 export enum DexFieldEnum {
@@ -53,13 +57,15 @@ export const DexFieldNames = {
 // LENDING DETAILS
 
 export enum LendingProductEnum {
-  AAVE = "AAVE",
+  AAVE_V2 = "AAVE_V2",
+  AAVE_V3 = "AAVE_V3",
   COMPOUND = "COMPOUND",
   MORPHO = "MORPHO",
 }
 
 export const LendingProductNames = {
-  [LendingProductEnum.AAVE]: "Aave",
+  [LendingProductEnum.AAVE_V2]: "Aave V2",
+  [LendingProductEnum.AAVE_V3]: "Aave V3",
   [LendingProductEnum.COMPOUND]: "Compound",
   [LendingProductEnum.MORPHO]: "Morpho",
 };

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { createServer } from "http";
 
 import app from "./app";
-import { syncDbModels } from "./db/config/connection";
+import { syncDbModels } from "./db/connection";
 import env from "./utils/env.util";
 
 const start = async (): Promise<void> => {
