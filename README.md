@@ -15,6 +15,15 @@ We created a submodule in our github repo to automatically update with the Messa
   - pip install psycopg2-binary
   - run `pip install -r requirements.txt` (Install app requirements)
   - run `pip install -e .` (Install the 'backend' package)
+  - connect to the db by adding a database.ini file in this format:
+
+        [postgresql]
+        host=localhost
+        database=mydatabase
+        user=myuser
+        password=mypassword
+
+    
   - Setup .env by copying .env.example to .env and seed with correct data
   - Setup the database with `flask db upgrade`
   - Start the backend app with `flask run`
