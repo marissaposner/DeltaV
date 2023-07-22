@@ -12,7 +12,6 @@ class SubgraphService:
                 open(os.getcwdb().decode("utf-8") + "/subgraphs/deployment/deployment.json")
             )[protocol]
         
-        
         try:
             # see if deployed on given chain
             assert f"{protocol}-{chain}" in self.deployments["deployments"]
