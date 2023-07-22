@@ -22,6 +22,7 @@ We created a submodule in our github repo to automatically update with the Messa
         database=mydatabase
         user=myuser
         password=mypassword
+        port=myport
 
     
   - Setup .env by copying .env.example to .env and seed with correct data
