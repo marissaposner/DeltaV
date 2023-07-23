@@ -19,8 +19,6 @@ export const loader = async ({ request }) => {
 
   const token = await currentToken({ request });
 
-  console.log(token);
-
   return {
     endpoints: await getEndpoints(token),
   };
@@ -34,8 +32,6 @@ export default function EndpointsIndex() {
     Running: "text-green-400 bg-green-400/10",
     Error: "text-rose-400 bg-rose-400/10",
   };
-
-  console.log(endpoints.data.endpoints);
 
   const colours = getColours();
 

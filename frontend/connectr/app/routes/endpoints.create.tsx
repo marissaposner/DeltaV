@@ -228,43 +228,7 @@ export default function CreateEndpoint() {
               />
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="flex justify-between">
-        <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
-          <h2 className="mb-4 font-bold">DEX</h2>
-          <MultipleList
-            name="dex"
-            options={dex}
-            className="mb-4"
-            clickEvent={setDexProducts}
-            clickIconEvent={loadAttributes}
-            showIcon={true}
-            hideValue={true}
-          />
-          <h2 className="mb-4 font-bold">Lending</h2>
-          <MultipleList
-            name="lending"
-            options={lending}
-            className="mb-8"
-            clickEvent={setLendingProducts}
-            clickIconEvent={loadAttributes}
-            showIcon={true}
-            hideValue={true}
-          />
-          <hr className="mb-5" />
-          <h2 className="mb-4 font-bold">Tokens</h2>
-
-          <MultipleList
-            options={tokens}
-            name="tokens"
-            className="mb-8"
-            clickEvent={setSelectedTokens}
-            clickIconEvent={loadAttributes}
-            showIcon={true}
-            hideValue={false}
-          />
           <hr className="mb-5" />
           <h2 className="mb-4 font-bold">Custom Contract</h2>
 
@@ -324,12 +288,49 @@ export default function CreateEndpoint() {
                   name="abi"
                   placeholder="Enter a contract address to pull the ABI automatically"
                   readOnly={true}
-                  rows={15}
+                  rows={8}
                   value={abi}
                 />
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between">
+        <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
+          <h2 className="mb-4 font-bold">DEX</h2>
+          <MultipleList
+            name="dex"
+            options={dex}
+            className="mb-4"
+            clickEvent={setDexProducts}
+            clickIconEvent={loadAttributes}
+            showIcon={true}
+            hideValue={true}
+          />
+          <h2 className="mb-4 font-bold">Lending</h2>
+          <MultipleList
+            name="lending"
+            options={lending}
+            className="mb-8"
+            clickEvent={setLendingProducts}
+            clickIconEvent={loadAttributes}
+            showIcon={true}
+            hideValue={true}
+          />
+          <hr className="mb-5" />
+          <h2 className="mb-4 font-bold">Tokens</h2>
+
+          <MultipleList
+            options={tokens}
+            name="tokens"
+            className="mb-8"
+            clickEvent={setSelectedTokens}
+            clickIconEvent={loadAttributes}
+            showIcon={true}
+            hideValue={false}
+          />
         </div>
         <div className="bg-white shadow-standard px-12 py-9 basis-[32%]">
           <h2 className="mb-4 font-bold">

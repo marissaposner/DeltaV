@@ -1,13 +1,69 @@
+import { Form, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
 import Select from "~/components/forms/Select";
-import { requireAuth } from "~/services/auth.server";
+import { getEndpoints } from "~/services/api.server";
+import { currentToken, requireAuth } from "~/services/auth.server";
 
 export const loader = async ({ request }) => {
   await requireAuth({ request });
 
-  return null;
+  const token = await currentToken({ request });
+
+  return {
+    endpoints: await getEndpoints(token),
+  };
+};
+
+export const action = async ({ request }: ActionArgs) => {
+  const form = await request.formData();
+  // const body = form.get("body");
+
+  // if (body) {
+  //   const json = JSON.parse(body, reviver);
+
+  //   if (json.products && json.name && json.products.size > 0) {
+  //     let productsJSON = [];
+  //     const token = await currentToken({ request });
+
+  //     json.products.forEach((value, key) => {
+  //       if (value && Array.isArray(value) && value.length > 0) {
+  //         value.forEach((v, k) => {
+  //           if (v.enabled) {
+  //             productsJSON.push({
+  //               fieldNameEnum: v.value,
+  //               productNameEnum: key,
+  //             });
+  //           }
+  //         });
+  //       }
+  //     });
+
+  //     if (productsJSON.length > 0) {
+  //       const response = await createEndpoint(
+  //         json.contractAddress && json.contractAddress.length > 0
+  //           ? json.contractAddress
+  //           : token,
+  //         JSON.stringify({
+  //           name: json.name,
+  //           fieldsToCreate: productsJSON,
+  //         })
+  //       );
+
+  //       console.log(productsJSON);
+  //       console.log(response);
+
+  //       return {
+  //         status: true,
+  //       };
+  //     }
+  //   }
+  // }
+
+  return {
+    status: false,
+  };
 };
 
 export default function CreateActions() {
@@ -17,31 +73,23 @@ export default function CreateActions() {
   const [selectedAction, setSelectedAction] = useState(null);
   const [selectedOperator, setSelectedOperator] = useState(null);
 
-  const optionsEndpoint = [{ id: 1, name: "Endpoint XYZ" }];
   const optionsIfConditions = [{ id: 1, name: "Condition X" }];
   const optionsActions = [{ id: 1, name: "Action X" }];
   const optionsOperators = [{ id: 1, name: "Greater Than (>)" }];
 
-  useEffect(() => {
-    console.log("Text in actionName:", actionName);
-    console.log("Selected selectedEndpoint:", selectedEndpoint);
-    console.log("Selected selectedIfCondition:", selectedIfCondition);
-    console.log("Selected selectedAction:", selectedAction);
-    console.log("Selected selectedOperator:", selectedOperator);
-  }, [
-    actionName,
-    selectedEndpoint,
-    selectedIfCondition,
-    selectedAction,
-    selectedOperator,
-  ]);
+  const { endpoints } = useLoaderData();
 
   return (
     <>
-      <Title title="Create Action" className="mb-9" ctaTitle="Save Action" />
+      <Form method="post">
+        <Title
+          title="Create Action"
+          className="mb-9"
+          ctaTitle="Save Action"
+          ctaType="submit"
+        />
 
-      <div className="bg-white shadow-standard px-12 py-9">
-        <form>
+        <div className="bg-white shadow-standard px-12 py-9">
           <h2 className="text-base font-semibold leading-7 text-gray-900">
             Action Conditions
           </h2>
@@ -68,6 +116,22 @@ export default function CreateActions() {
 
             <div className="sm:col-span-4">
               <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Contract Address
+              </label>
+              <div className="mt-2">
+                <InputText
+                  name="contractAddress"
+                  clickEvent={setActionName}
+                  placeholder="Contract address"
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-4">
+              <label
                 htmlFor="country"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
@@ -75,7 +139,8 @@ export default function CreateActions() {
               </label>
               <div className="mt-2">
                 <Select
-                  options={optionsEndpoint}
+                  name="endpoint"
+                  options={endpoints.data?.endpoints}
                   clickEvent={setSelectedEndpoint}
                 />
               </div>
@@ -113,6 +178,7 @@ export default function CreateActions() {
                   </label>
                   <div className="mt-2">
                     <Select
+                      name="operator"
                       options={optionsOperators}
                       clickEvent={setSelectedOperator}
                     />
@@ -146,14 +212,15 @@ export default function CreateActions() {
               </label>
               <div className="mt-2">
                 <Select
+                  name="action"
                   options={optionsActions}
                   clickEvent={setSelectedAction}
                 />
               </div>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </Form>
     </>
   );
 }

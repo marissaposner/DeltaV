@@ -170,22 +170,37 @@ export enum ActionTypeEnum {
   TRANSFER = "TRANSFER",
 }
 
+export enum ISwapEnum {
+  "amount" = "amount",
+  "tokenIn" = "tokenIn",
+  "tokenOut" = "tokenOut",
+}
 export interface ISwap {
-  amount: string;
-  tokenIn: TokenProductEnum;
-  tokenOut: TokenProductEnum;
+  [ISwapEnum.amount]: string;
+  [ISwapEnum.tokenIn]: TokenProductEnum;
+  [ISwapEnum.tokenOut]: TokenProductEnum;
 }
 
-export interface ITransfer {
-  amount: string;
-  token: TokenProductEnum;
+export enum ITransferEnum {
+  "amount" = "amount",
+  "token" = "token",
 }
+export interface ITransfer {
+  [ITransferEnum.amount]: string;
+  [ITransferEnum.token]: string;
+}
+
+const checkAllFields = (keyEnums: any, obj: any) =>
+  Object.keys(keyEnums).reduce(
+    (previous, current) => previous && current in obj, //&& typeof obj[current] === ITransfer[current],
+    true
+  );
 
 export const checkActionTypePayload = {
   [ActionTypeEnum.SWAP]: (obj: any): obj is ISwap =>
-    "type" in obj && obj.type === "ISwap",
+    checkAllFields(ISwapEnum, obj),
   [ActionTypeEnum.TRANSFER]: (obj: any): obj is ITransfer =>
-    "type" in obj && obj.type === "ITransfer",
+    checkAllFields(ITransferEnum, obj),
 };
 
 export enum OperatorEnum {
