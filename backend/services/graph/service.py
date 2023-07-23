@@ -107,7 +107,7 @@ class GraphService:
             hosted=(self.subgraph.service_type == "hosted-service"),
         )
         if data == None:
-            raise ValueError()
+            raise ValueError("Data from execute_query_thegraph was None.")
         data = self.ensure_enumerable(data)
         for dict_item in data:
             for key, val in dict_item.items():
