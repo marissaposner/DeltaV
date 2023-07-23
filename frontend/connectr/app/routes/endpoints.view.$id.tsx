@@ -1,8 +1,9 @@
 import { redirect, type V2_MetaFunction } from "@remix-run/node";
 import { Title } from "~/components/common/Title";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { requireAuth } from "~/services/auth.server";
 import InputTextArea from "~/components/forms/InputTextArea";
+import { AppRouting } from "~/utils/routes";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -25,6 +26,7 @@ export const loader = async ({ request, params }) => {
 
 export default function EndpointsView() {
   const { id } = useLoaderData();
+  const navigate = useNavigate();
 
   const value = JSON.stringify([
     {
@@ -58,7 +60,15 @@ export default function EndpointsView() {
 
   return (
     <>
-      <Title title="Endpoint Data" className="mb-9" />
+      <Title
+        title="Endpoint Data"
+        className="mb-9"
+        ctaTitle="Back to Endpoints"
+        ctaAction={(e) => {
+          e.preventDefault();
+          navigate(AppRouting.ENDPOINTS);
+        }}
+      />
 
       <div className="bg-white shadow-standard px-12 py-9">
         <h2 className="text-base font-semibold leading-7 text-gray-900">
