@@ -1,24 +1,84 @@
+import { redirect } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
 import Select from "~/components/forms/Select";
-import { getEndpoints } from "~/services/api.server";
+import { ActionFieldEnums, OperatorFieldEnums } from "~/models/misc";
+import { ActionTypeEnum, TokenProductNames } from "~/models/products";
+import { getEndpointFields, getEndpoints } from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
+import {
+  classNames,
+  convertObjectToIdName,
+  fieldsToSelect,
+} from "~/utils/common";
 
-export const loader = async ({ request }) => {
+export const loader = async ({ request, params }) => {
   await requireAuth({ request });
+
+  const id = params.id;
+
+  if (!id) return redirect("/");
 
   const token = await currentToken({ request });
 
   return {
     endpoints: await getEndpoints(token),
+    fields: await getEndpointFields(token, id),
   };
 };
 
 export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
-  // const body = form.get("body");
+  const name = form.get("name");
+  const address = form.get("address");
+  const field = form.get("field");
+  const operator = form.get("operator");
+  const threshold = form.get("threshold");
+  const actionType = form.get("actionType");
+
+  if (name && address && field && operator && threshold && actionType) {
+    let data = {
+      name,
+      address,
+      field,
+      operator,
+      threshold,
+      actionType,
+      fieldNameEnum: field,
+      actionPayload: "",
+    };
+
+    if (actionType == ActionFieldEnums.SWAP) {
+      const tokenIn = form.get("tokenIn");
+      const tokenOut = form.get("tokenOut");
+      const amount = form.get("amount");
+
+      if (tokenIn && tokenOut && amount) {
+        data.actionPayload = JSON.stringify({
+          tokenIn,
+          tokenOut,
+          amount,
+        });
+      }
+    } else if (actionType == ActionFieldEnums.TRANSFER) {
+      const token = form.get("token");
+      const amount = form.get("amount");
+
+      if (token && amount) {
+        data.actionPayload = JSON.stringify({
+          token,
+          amount,
+        });
+      }
+    }
+  }
+
+  return {
+    status: false,
+  };
 
   // if (body) {
   //   const json = JSON.parse(body, reviver);
@@ -73,11 +133,7 @@ export default function CreateActions() {
   const [selectedAction, setSelectedAction] = useState(null);
   const [selectedOperator, setSelectedOperator] = useState(null);
 
-  const optionsIfConditions = [{ id: 1, name: "Condition X" }];
-  const optionsActions = [{ id: 1, name: "Action X" }];
-  const optionsOperators = [{ id: 1, name: "Greater Than (>)" }];
-
-  const { endpoints } = useLoaderData();
+  const { endpoints, fields } = useLoaderData();
 
   return (
     <>
@@ -123,14 +179,14 @@ export default function CreateActions() {
               </label>
               <div className="mt-2">
                 <InputText
-                  name="contractAddress"
+                  name="address"
                   clickEvent={setActionName}
                   placeholder="Contract address"
                 />
               </div>
             </div>
 
-            <div className="sm:col-span-4">
+            {/* <div className="sm:col-span-4">
               <label
                 htmlFor="country"
                 className="block text-sm font-medium leading-6 text-gray-900"
@@ -144,7 +200,7 @@ export default function CreateActions() {
                   clickEvent={setSelectedEndpoint}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="sm:col-span-4">
               <label
@@ -155,7 +211,8 @@ export default function CreateActions() {
               </label>
               <div className="mt-2">
                 <Select
-                  options={optionsIfConditions}
+                  name="field"
+                  options={fieldsToSelect(fields.data.endpointFields)}
                   clickEvent={setSelectedIfCondition}
                 />
               </div>
@@ -179,7 +236,7 @@ export default function CreateActions() {
                   <div className="mt-2">
                     <Select
                       name="operator"
-                      options={optionsOperators}
+                      options={convertObjectToIdName(OperatorFieldEnums)}
                       clickEvent={setSelectedOperator}
                     />
                   </div>
@@ -195,7 +252,7 @@ export default function CreateActions() {
                   <div className="mt-2">
                     <InputText
                       inputType="number"
-                      name="conditionValue"
+                      name="threshold"
                       placeholder="Input a number"
                     />
                   </div>
@@ -212,10 +269,109 @@ export default function CreateActions() {
               </label>
               <div className="mt-2">
                 <Select
-                  name="action"
-                  options={optionsActions}
+                  name="actionType"
+                  options={convertObjectToIdName(ActionFieldEnums)}
                   clickEvent={setSelectedAction}
                 />
+              </div>
+            </div>
+
+            <div
+              className={classNames(
+                "sm:col-span-4",
+                selectedAction && selectedAction.id == ActionTypeEnum.TRANSFER
+                  ? "block"
+                  : "hidden"
+              )}
+            >
+              <div className="flex justify-between">
+                <div className="sm:col-span-3 basis-1/2 mr-1">
+                  <label
+                    htmlFor="token"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Token
+                  </label>
+                  <div className="mt-2">
+                    <Select
+                      name="token"
+                      options={convertObjectToIdName(TokenProductNames)}
+                    />
+                  </div>
+                </div>
+
+                <div className="sm:col-span-3 basis-1/2">
+                  <label
+                    htmlFor="last-name"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Amount
+                  </label>
+                  <div className="mt-2">
+                    <InputText
+                      inputType="number"
+                      name="amount"
+                      placeholder="Input an amount"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={classNames(
+                "sm:col-span-4",
+                selectedAction && selectedAction.id == ActionTypeEnum.SWAP
+                  ? "block"
+                  : "hidden"
+              )}
+            >
+              <div className="flex justify-between mb-4">
+                <div className="sm:col-span-3 basis-1/2 mr-1">
+                  <label
+                    htmlFor="token"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Token In
+                  </label>
+                  <div className="mt-2">
+                    <Select
+                      name="tokenIn"
+                      options={convertObjectToIdName(TokenProductNames)}
+                    />
+                  </div>
+                </div>
+
+                <div className="sm:col-span-3 basis-1/2">
+                  <label
+                    htmlFor="last-name"
+                    className="block text-sm leading-6 text-gray-900"
+                  >
+                    Token Out
+                  </label>
+                  <div className="mt-2">
+                    <Select
+                      name="tokenOut"
+                      options={convertObjectToIdName(TokenProductNames)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="last-name"
+                  className="block text-sm leading-6 text-gray-900"
+                >
+                  Amount
+                </label>
+                <div className="mt-2">
+                  <InputText
+                    inputType="number"
+                    name="amount"
+                    placeholder="Input an amount"
+                  />
+                </div>
               </div>
             </div>
           </div>

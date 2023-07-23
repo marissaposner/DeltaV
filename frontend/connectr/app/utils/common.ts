@@ -17,6 +17,34 @@ export function getRandomArbitrary(min : number, max : number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+export function fieldsToSelect(obj: Array<object>) {
+  let result = []
+
+  if(obj && Array.isArray(obj) && obj.length > 0) {
+    obj.forEach((v) => {
+      result.push({
+        id: v.field ? v.field?.fieldNameEnum : '',
+        name: v.field ? v.field?.fieldNameEnum : ''
+      })
+    })
+  }
+
+  return result
+}
+
+export function convertObjectToIdName(obj: object) {
+  let result = []
+
+  for (const key in obj) {
+    result.push({
+      id: key,
+      name: obj[key],
+    })
+  }
+  
+  return result
+}
+
 export function convertObjectToNameValue(obj: object) {
   let result = []
 
@@ -26,7 +54,7 @@ export function convertObjectToNameValue(obj: object) {
       value: key,
       enabled: false,
     })
-}
+  }
   
   return result
 }
