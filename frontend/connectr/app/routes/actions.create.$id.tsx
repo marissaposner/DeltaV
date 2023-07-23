@@ -7,7 +7,11 @@ import InputText from "~/components/forms/InputText";
 import Select from "~/components/forms/Select";
 import { ActionFieldEnums, OperatorFieldEnums } from "~/models/misc";
 import { ActionTypeEnum, TokenProductNames } from "~/models/products";
-import { getEndpointFields, getEndpoints } from "~/services/api.server";
+import {
+  createAction,
+  getEndpointFields,
+  getEndpoints,
+} from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
 import {
   classNames,
@@ -25,6 +29,7 @@ export const loader = async ({ request, params }) => {
   const token = await currentToken({ request });
 
   return {
+    id,
     endpoints: await getEndpoints(token),
     fields: await getEndpointFields(token, id),
   };
@@ -38,8 +43,17 @@ export const action = async ({ request }: ActionArgs) => {
   const operator = form.get("operator");
   const threshold = form.get("threshold");
   const actionType = form.get("actionType");
+  const endpoint = form.get("endpoint");
 
-  if (name && address && field && operator && threshold && actionType) {
+  if (
+    name &&
+    address &&
+    field &&
+    operator &&
+    threshold &&
+    actionType &&
+    endpoint
+  ) {
     let data = {
       name,
       address,
@@ -74,52 +88,16 @@ export const action = async ({ request }: ActionArgs) => {
         });
       }
     }
+
+    const token = await currentToken({ request });
+    const response = await createAction(token, JSON.stringify(data), endpoint);
+
+    console.log(response);
+
+    return {
+      status: true,
+    };
   }
-
-  return {
-    status: false,
-  };
-
-  // if (body) {
-  //   const json = JSON.parse(body, reviver);
-
-  //   if (json.products && json.name && json.products.size > 0) {
-  //     let productsJSON = [];
-  //     const token = await currentToken({ request });
-
-  //     json.products.forEach((value, key) => {
-  //       if (value && Array.isArray(value) && value.length > 0) {
-  //         value.forEach((v, k) => {
-  //           if (v.enabled) {
-  //             productsJSON.push({
-  //               fieldNameEnum: v.value,
-  //               productNameEnum: key,
-  //             });
-  //           }
-  //         });
-  //       }
-  //     });
-
-  //     if (productsJSON.length > 0) {
-  //       const response = await createEndpoint(
-  //         json.contractAddress && json.contractAddress.length > 0
-  //           ? json.contractAddress
-  //           : token,
-  //         JSON.stringify({
-  //           name: json.name,
-  //           fieldsToCreate: productsJSON,
-  //         })
-  //       );
-
-  //       console.log(productsJSON);
-  //       console.log(response);
-
-  //       return {
-  //         status: true,
-  //       };
-  //     }
-  //   }
-  // }
 
   return {
     status: false,
@@ -127,13 +105,13 @@ export const action = async ({ request }: ActionArgs) => {
 };
 
 export default function CreateActions() {
-  const [actionName, setActionName] = useState(null);
-  const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+  // const [actionName, setActionName] = useState(null);
+  // const [selectedEndpoint, setSelectedEndpoint] = useState(null);
   const [selectedIfCondition, setSelectedIfCondition] = useState(null);
   const [selectedAction, setSelectedAction] = useState(null);
   const [selectedOperator, setSelectedOperator] = useState(null);
 
-  const { endpoints, fields } = useLoaderData();
+  const { endpoints, fields, id } = useLoaderData();
 
   return (
     <>
@@ -144,6 +122,8 @@ export default function CreateActions() {
           ctaTitle="Save Action"
           ctaType="submit"
         />
+
+        <input type="hidden" value={id} name="endpoint" />
 
         <div className="bg-white shadow-standard px-12 py-9">
           <h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -164,7 +144,7 @@ export default function CreateActions() {
               <div className="mt-2">
                 <InputText
                   name="name"
-                  clickEvent={setActionName}
+                  // clickEvent={setActionName}
                   placeholder="Name of action"
                 />
               </div>
@@ -180,7 +160,7 @@ export default function CreateActions() {
               <div className="mt-2">
                 <InputText
                   name="address"
-                  clickEvent={setActionName}
+                  // clickEvent={setActionName}
                   placeholder="Contract address"
                 />
               </div>
