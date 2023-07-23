@@ -37,13 +37,16 @@ CHAINS = [
 ]
 address_list = get_address_pairs()
 dex_table_structure="""id SERIAL PRIMARY KEY,
-    createdtimestamp VARCHAR(255),
-    createdblocknumber TEXT,
-    name TEXT,
-    symbol TEXT,
-    totalvaluelockedusd VARCHAR(255),
-    cumulativevolumeusd VARCHAR(255),
-    contractaddress VARCHAR(255),
+    timestamp VARCHAR(255),
+    blocknumber TEXT,
+    hash VARCHAR(255),
+    logindex VARCHAR(255),
+    tokenin TEXT,
+    tokenout TEXT,
+    amountout VARCHAR(255), 
+    amountoutusd VARCHAR(255),
+    amountin VARCHAR(255), 
+    amountinusd VARCHAR(255),
     source VARCHAR(255)"""
 
 # arbitrum_subgraphs =['JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk']
@@ -88,11 +91,11 @@ def execute_query_thegraph(subgraph_id, query, hosted=True):
         print(r.json())
 class GraphService:
     def __init__(self, protocol=DEFAULT_PROTOCOL, chain=DEFAULT_CHAIN):
-        print('protocol', protocol)
-        print('DEFAULT CHAIN', chain)
+        # print('protocol', protocol)
+        # print('DEFAULT CHAIN', chain)
         # os.chdir('..')
         self.build_subgraphs_json()
-        print('after build_subgraphs_json')
+        # print('after build_subgraphs_json')
         self.subgraph = SubgraphService(protocol, chain)
     
     def ensure_enumerable(self, data):
@@ -151,17 +154,17 @@ class GraphService:
             indent=2,
             orient="index",
         ).replace("\\/", "/")
-        print(
-            json_dump,
-            file=open(
-                os.path.join(
-                    os.getcwdb().decode("utf-8"),
-                    "backend/services/graph/",
-                    "subgraphs.json",
-                ),
-                "w",
-            ),
-        )
+        # print(
+        #     json_dump,
+        #     file=open(
+        #         os.path.join(
+        #             os.getcwdb().decode("utf-8"),
+        #             "backend/services/graph/",
+        #             "subgraphs.json",
+        #         ),
+        #         "w",
+        #     ),
+        # )
         return df
 
 query = """{
@@ -320,10 +323,6 @@ query_uniswap= """query UniswapV3SwapTransactions {{
 #     flatten(y)
 #     return out
 
-protocol = 'uniswap-v3'
-graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
-print('after graph_service')
-
 
 # #read in queries
 # queries_file = open("backend/services/graph/queries.txt", "r")
@@ -356,37 +355,222 @@ print('after graph_service')
 #     query = query.replace("{token1}", token1).replace("{token2}", token2)
 #     result = graph_service.query_thegraph(query)
 
+protocol = 'pancakeswap-v3'
+graph_service = GraphService(protocol = 'pancakeswap-v3', chain='ethereum')
+print('after graph_service')
 
 swap_data_query=queries['swap_data']
 print('swap_data_query', swap_data_query)
 #using
+token_pairs = [("BUSD", "DAI"),
 
-result = graph_service.query_thegraph(swap_data_query)
-# print('result.type', isinstance(result, list))
-df=pd.DataFrame(result)
-df.rename(columns={'id': 'contractAddress'}, inplace=True)
-# #add column for where data is from 
-df['source']=protocol
-print('db', df)
-data_to_send = DbService.insert_data(df, 'raw_graph_data_uniswap',dex_table_structure)
+("BUSD", "USDC"),
 
-# print()
+("BUSD", "USDT"),
+
+("BUSD", "RETH"),
+
+("BUSD", "WSTETH"),
+
+("BUSD", "cbETH"),
+
+("BUSD", "WETH"),
+
+("BUSD", "MATIC"),
+
+("BUSD", "WBTC"),
+
+("DAI", "USDC"),
+
+("DAI", "USDT"),
+
+("DAI", "RETH"),
+
+("DAI", "WSTETH"),
+
+("DAI", "cbETH"),
+
+("DAI", "WETH"),
+
+("DAI", "MATIC"),
+
+("DAI", "WBTC"),
+
+("USDC", "USDT"),
+
+("USDC", "RETH"),
+
+("USDC", "WSTETH"),
+
+("USDC", "cbETH"),
+
+("USDC", "WETH"),
+
+("USDC", "MATIC"),
+
+("USDC", "WBTC"),
+
+("USDT", "RETH"),
+
+("USDT", "WSTETH"),
+
+("USDT", "cbETH"),
+
+("USDT", "WETH"),
+
+("USDT", "MATIC"),
+
+("USDT", "WBTC"),
+
+("RETH", "WSTETH"),
+
+("RETH", "cbETH"),
+
+("RETH", "WETH"),
+
+("RETH", "MATIC"),
+
+("RETH", "WBTC"),
+
+("WSTETH", "cbETH"),
+
+("WSTETH", "WETH"),
+
+("WSTETH", "MATIC"),
+
+("WSTETH", "WBTC"),
+
+("cbETH", "WETH"),
+
+("cbETH", "MATIC"),
+
+("cbETH", "WBTC"),
+
+("WETH", "MATIC"),
+
+("WETH", "WBTC"),
+
+("MATIC", "WBTC")]
 
 
 
 
 
 
-### junk below
-# graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
-# result = graph_service.query_thegraph(query_liquidity)
-# print()
 
-# for graph in graphs:
-#     print('graph', graph)
-#     graph_service = GraphService(protocol = 'graph', chain='ethereum')
-#     print('after graph_service')
-#     result = graph_service.query_thegraph(query_liquidity)
+
+query_template = """
+query UniswapV3SwapTransactions {
+  swaps (
+    where:{
+      and: [
+        {
+          tokenIn_: {
+            symbol: "%s"
+          }
+        }
+        {
+          tokenOut_: {
+            symbol: "%s"
+          }
+        }
+        {
+          blockNumber_gt: 17742547
+        }
+      ]
+    }
+  ) {
+      timestamp
+      blockNumber
+      hash
+      logIndex
+      tokenIn {
+        symbol
+      }
+      tokenOut {
+        symbol
+      }
+      amountOut
+      amountOutUSD
+      amountIn
+      amountInUSD
+  }
+}
+"""
+
+insert_query = """
+    INSERT INTO raw_graph_data_uniswap 
+    (timestamp, blocknumber, hash, logindex, tokenin_symbol, tokenout_symbol, amountout, amountoutusd, amountin, amountinusd)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+"""
+
+# Convert the DataFrame to a list of tuples to use with the SQL query
+
+# Iterate through the token pairs
+for token1, token2 in token_pairs:
+    # Format the query with the current token pair
+    query = query_template % (token1, token2)
+    
+    # Send the request
+    graph_service = GraphService(protocol = 'f-v3', chain='ethereum')
+    result = graph_service.query_thegraph(query)
+    result = pd.DataFrame(result)
+    result.columns = result.columns.str.lower()
+    # print('result.cols', result.columns)
+    # print('result data from graph', result)
+    result['source']='pancakeswap-v3'
+    data_to_insert = [
+    (
+        row['timestamp'], 
+        row['blocknumber'], 
+        row['hash'], 
+        row['logindex'], 
+        row['tokenin']['symbol'], 
+        row['tokenout']['symbol'], 
+        row['amountout'], 
+        row['amountoutusd'], 
+        row['amountin'], 
+        row['amountinusd']
+    )
+    for index, row in result.iterrows()
+]
+    # print('data_to_insert',data_to_insert)
+    
+    data_to_send = DbService.insert_data(result, 'raw_graph_data_pancakeswap', dex_table_structure)
+
+    # response = requests.post(url, json={'query': query})
+
+# for token1, token2 in zip(tokens):
+#         print('token1', token1)
+#         print('token2: ', token2)
+#         # print('pull_pools_query', pull_pools_query)
+    
+# result = graph_service.query_thegraph(swap_data_query)
+# # print('result.type', isinstance(result, list))
+# df=pd.DataFrame(result)
+# df.rename(columns={'id': 'contractAddress'}, inplace=True)
+# # #add column for where data is from 
+# df['source']=protocol
+# print('db', df)
+# data_to_send = DbService.insert_data(df, 'raw_graph_data_uniswap',dex_table_structure)
+
+# # print()
+
+
+
+
+
+
+# ### junk below
+# # graph_service = GraphService(protocol = 'uniswap-v3', chain='ethereum')
+# # result = graph_service.query_thegraph(query_liquidity)
+# # print()
+
+# # for graph in graphs:
+# #     print('graph', graph)
+# #     graph_service = GraphService(protocol = 'graph', chain='ethereum')
+# #     print('after graph_service')
+# #     result = graph_service.query_thegraph(query_liquidity)
 #     print()
 #     # print(result)
 #     print("graph name: ", graph )
