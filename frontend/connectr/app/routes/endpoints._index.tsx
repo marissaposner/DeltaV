@@ -6,6 +6,7 @@ import { classNames, getColours } from "~/utils/common";
 import { currentToken, requireAuth } from "~/services/auth.server";
 import { getEndpoints } from "~/services/api.server";
 import { format, parseISO } from "date-fns";
+import DataSources from "~/components/common/DataSources";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -122,6 +123,7 @@ export default function EndpointsIndex() {
                             {source}
                           </span>
                         ))} */}
+                        <DataSources endpointId={endpoint.id} />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <div className="flex items-center justify-end gap-x-2 sm:justify-start">
