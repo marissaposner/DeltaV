@@ -1,7 +1,11 @@
 # Delta V
-ETH Global Paris Hackathon Project
+## Delta V is the first, truly actionable data layer. In minutes, you can launch customized on-chain data streams and automated, on-chain actions. 
+We allow developers and administrators to take back control of their data and their user base by launching customized on-chain data streams and setting up if, then workflows for on-chain actions that will allow them to always stay 1 step ahead. 
+
+Our official submission for ETH Global Paris Hackathon
 
 
+Setup:
 We created a submodule in our github repo to automatically update with the Messari Subgraphs (https://github.com/messari/subgraphs). We chose these subgraphs because they have a more standardized schema than other subgraphs and were easier to build an abstraction layer on top of them.
 
 
