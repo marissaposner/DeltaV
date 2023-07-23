@@ -79,6 +79,12 @@ export async function getEndpoints(account: string, data? : object) {
      }, data, true)
 }
 
+export async function getActions(account: string) {    
+     return await makeAPIRequest(getAPIBaseURL() + 'actions', {
+        user_id: account
+     }, null, true)
+}
+
 export async function getEndpointFields(account: string, endpointId: string) {    
     return await makeAPIRequest(getAPIBaseURL() + 'endpoints/' + endpointId + '/fields', {
        user_id: account
@@ -86,7 +92,7 @@ export async function getEndpointFields(account: string, endpointId: string) {
 }
 
 export async function createAction(account: string, data : string, endpointId: string) {
-    return await makeAPIRequest(getAPIBaseURL() + endpointId + '/actions', {
+    return await makeAPIRequest(getAPIBaseURL() + 'endpoints/' + endpointId + '/actions', {
        user_id: account,
        'Content-Type': 'application/json',
     }, data)

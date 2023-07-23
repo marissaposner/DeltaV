@@ -39,36 +39,37 @@ export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
   const name = form.get("name");
   const address = form.get("address");
-  const field = form.get("field");
+  const fieldId = form.get("field");
   const operator = form.get("operator");
   const threshold = form.get("threshold");
   const actionType = form.get("actionType");
-  const endpoint = form.get("endpoint");
+  const endpointId = form.get("endpoint");
 
   if (
     name &&
     address &&
-    field &&
+    fieldId &&
     operator &&
     threshold &&
     actionType &&
-    endpoint
+    endpointId
   ) {
     let data = {
       name,
       address,
-      field,
+      fieldId,
       operator,
       threshold,
       actionType,
-      fieldNameEnum: field,
       actionPayload: "",
     };
 
-    if (actionType == ActionFieldEnums.SWAP) {
+    if (actionType == ActionTypeEnum.SWAP) {
       const tokenIn = form.get("tokenIn");
       const tokenOut = form.get("tokenOut");
-      const amount = form.get("amount");
+      const amount = form.get("amountSwap");
+
+      console.log(tokenIn, tokenOut, amount);
 
       if (tokenIn && tokenOut && amount) {
         data.actionPayload = JSON.stringify({
@@ -77,7 +78,7 @@ export const action = async ({ request }: ActionArgs) => {
           amount,
         });
       }
-    } else if (actionType == ActionFieldEnums.TRANSFER) {
+    } else if (actionType == ActionTypeEnum.TRANSFER) {
       const token = form.get("token");
       const amount = form.get("amount");
 
@@ -89,8 +90,14 @@ export const action = async ({ request }: ActionArgs) => {
       }
     }
 
+    console.log(JSON.stringify(data));
+
     const token = await currentToken({ request });
-    const response = await createAction(token, JSON.stringify(data), endpoint);
+    const response = await createAction(
+      token,
+      JSON.stringify(data),
+      endpointId
+    );
 
     console.log(response);
 
@@ -348,7 +355,7 @@ export default function CreateActions() {
                 <div className="mt-2">
                   <InputText
                     inputType="number"
-                    name="amount"
+                    name="amountSwap"
                     placeholder="Input an amount"
                   />
                 </div>
