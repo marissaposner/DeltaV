@@ -3,6 +3,7 @@ export enum AppRouting {
     ENDPOINTS = '/endpoints',
     ACTIONS = '/actions',
     CREATE_ACTIONS = '/actions/create',
+    VIEW_ENDPOINT_DATA = '/endpoints/view',
     LOGIN = '/login',
     LOGOUT = '/logout',
     API_FIELDS = '/api/fields',

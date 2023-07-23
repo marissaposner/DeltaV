@@ -108,21 +108,6 @@ export default function EndpointsIndex() {
                         )}
                       </td>
                       <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500 flex flex-wrap max-w-[285px]">
-                        {/* {endpoint.sources.map((source, index) => (
-                          <span
-                            key={index}
-                            className={classNames(
-                              colours[index]
-                                ? colours[index]
-                                : colours[
-                                    getRandomArbitrary(0, colours.length)
-                                  ],
-                              "mr-1 mb-1 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ring-green-600/20"
-                            )}
-                          >
-                            {source}
-                          </span>
-                        ))} */}
                         <DataSources endpointId={endpoint.id} />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -157,6 +142,17 @@ export default function EndpointsIndex() {
                           className="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white"
                         >
                           Create Action
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(
+                              AppRouting.VIEW_ENDPOINT_DATA + "/" + endpoint.id
+                            )
+                          }
+                          type="button"
+                          className="ml-1 inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white"
+                        >
+                          View Data
                         </button>
                       </td>
                     </tr>
