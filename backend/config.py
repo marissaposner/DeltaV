@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 GRAPH_API_KEY = os.getenv("GRAPH_API_KEY")
-
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 
 from configparser import ConfigParser
 
