@@ -5,8 +5,10 @@ Use env var to override
 import os
 import psycopg2
 from configparser import ConfigParser
+import sys
 
-def make_conn(filename='backend/database/database.ini', section='postgresql'):
+print("path",os.getcwd())
+def make_conn(filename='/Users/corneliaweinzierl/Connectr/backend/database/database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
     # read config file
