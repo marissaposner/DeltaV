@@ -69,8 +69,6 @@ export const action = async ({ request }: ActionArgs) => {
       const tokenOut = form.get("tokenOut");
       const amount = form.get("amountSwap");
 
-      console.log(tokenIn, tokenOut, amount);
-
       if (tokenIn && tokenOut && amount) {
         data.actionPayload = JSON.stringify({
           tokenIn,
@@ -90,8 +88,6 @@ export const action = async ({ request }: ActionArgs) => {
       }
     }
 
-    console.log(JSON.stringify(data));
-
     const token = await currentToken({ request });
     const response = await createAction(
       token,
@@ -99,7 +95,7 @@ export const action = async ({ request }: ActionArgs) => {
       endpointId
     );
 
-    console.log(response);
+    // console.log(response);
 
     return {
       status: true,

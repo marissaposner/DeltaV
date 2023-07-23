@@ -6,6 +6,12 @@ export const OperatorFieldEnums = {
     [OperatorEnum.EQUALS]: "Equals",
 };
 
+export const OperatorSymbolEnums = {
+    [OperatorEnum.GREATER_THAN]: ">",
+    [OperatorEnum.LESS_THAN]: "<",
+    [OperatorEnum.EQUALS]: "=",
+};
+
 export const ActionFieldEnums = {
     [ActionTypeEnum.SWAP]: "Swap",
     [ActionTypeEnum.TRANSFER]: "Transfer",

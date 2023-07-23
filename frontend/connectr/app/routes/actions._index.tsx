@@ -1,6 +1,7 @@
 import { useLoaderData } from "@remix-run/react";
 import { format, parseISO } from "date-fns";
 import { Title } from "~/components/common/Title";
+import { OperatorSymbolEnums } from "~/models/misc";
 import { getActions } from "~/services/api.server";
 import { currentToken, requireAuth } from "~/services/auth.server";
 import { classNames } from "~/utils/common";
@@ -22,7 +23,7 @@ export default function Actions() {
     Error: "text-rose-400 bg-rose-400/10",
   };
 
-  console.log(actions);
+  // console.log(actions);
 
   return (
     <>
@@ -50,6 +51,18 @@ export default function Actions() {
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
+                    Operator
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Threshold
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
                     Date &amp; Time
                   </th>
                   <th
@@ -71,6 +84,14 @@ export default function Actions() {
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {action.name}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-blue-500/10">
+                          {OperatorSymbolEnums[action.operator]}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {action.threshold}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {format(

@@ -1,5 +1,5 @@
 import type { ActionArgs, V2_MetaFunction } from "@remix-run/node";
-import { Form, useFetcher, useSubmit } from "@remix-run/react";
+import { Form, useFetcher, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Title } from "~/components/common/Title";
 import InputText from "~/components/forms/InputText";
@@ -95,6 +95,7 @@ export default function CreateEndpoint() {
   const lending = convertObjectToNameValue(LendingProductNames);
 
   const submit = useSubmit();
+
   const abiFetcher = useFetcher();
 
   const [name, setName] = useState(null);

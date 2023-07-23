@@ -1,3 +1,4 @@
+import { useNavigation } from "@remix-run/react";
 import { classNames } from "~/utils/common";
 
 interface TitleProps {
@@ -10,6 +11,7 @@ interface TitleProps {
 
 export function Title(props: TitleProps) {
   const { title, className, ctaAction, ctaTitle, ctaType } = props;
+  const navigation = useNavigation();
 
   return (
     <>
@@ -29,9 +31,14 @@ export function Title(props: TitleProps) {
             <button
               onClick={ctaAction}
               type={ctaType ? ctaType : "button"}
-              className="ml-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className={classNames(
+                "ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
+                navigation.state === "submitting"
+                  ? "bg-gray-400 pointer-events-none"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              )}
             >
-              {ctaTitle}
+              {navigation.state === "submitting" ? "Saving" : ctaTitle}
             </button>
           </div>
         ) : null}

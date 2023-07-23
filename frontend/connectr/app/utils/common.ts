@@ -23,7 +23,7 @@ export function fieldsToSelect(obj: Array<object>) {
   if(obj && Array.isArray(obj) && obj.length > 0) {
     obj.forEach((v) => {
       result.push({
-        id: v.field ? v.fieldId : '',
+        id: v.field ? v.id : '',
         name: v.field ? v.field?.fieldNameEnum : ''
       })
     })
