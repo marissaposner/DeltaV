@@ -19,10 +19,12 @@ def insert_row_data(data_to_insert, table,table_structure):
     print('table: ', table)
     print('table_structure', table_structure)
     print()
-    create_table_statement = f"""
-    CREATE TABLE IF NOT EXISTS {table}( {table_structure})
-    """
-    cursor.execute(create_table_statement)
+    
+    # create_table_statement = f"""
+    # CREATE TABLE IF NOT EXISTS {table}( {table_structure})
+    # """
+
+    # cursor.execute(create_table_statement)
     insert_statement = f"""
     INSERT INTO {table} ({keys})
     VALUES ({values})
