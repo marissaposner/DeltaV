@@ -166,6 +166,9 @@ export default function CreateActions() {
                   // clickEvent={setActionName}
                   placeholder="Contract address"
                 />
+                <small className="mt-2 text-gray-400 w-full block">
+                  E.g: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+                </small>
               </div>
             </div>
 

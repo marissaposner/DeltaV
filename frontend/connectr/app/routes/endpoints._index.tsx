@@ -19,9 +19,12 @@ export const loader = async ({ request }) => {
   await requireAuth({ request });
 
   const token = await currentToken({ request });
+  let endpoints = await getEndpoints(token);
+
+  endpoints = endpoints?.data.endpoints.reverse();
 
   return {
-    endpoints: await getEndpoints(token),
+    endpoints,
   };
 };
 
@@ -91,9 +94,8 @@ export default function EndpointsIndex() {
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {endpoints &&
-                  endpoints.data?.endpoints &&
-                  Array.isArray(endpoints.data.endpoints) &&
-                  endpoints.data.endpoints.map((endpoint) => (
+                  Array.isArray(endpoints) &&
+                  endpoints.map((endpoint) => (
                     <tr key={endpoint.id} className="even:bg-gray-50">
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
                         #{endpoint.id}
@@ -109,6 +111,20 @@ export default function EndpointsIndex() {
                       </td>
                       <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500 flex flex-wrap max-w-[285px]">
                         <DataSources endpointId={endpoint.id} />
+
+                        {endpoint.id ==
+                        "efd49684-0598-4bb4-ae1b-e325cb19da17" ? (
+                          <span className="mr-1 mb-1 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-green-600/10">
+                            Airstack
+                          </span>
+                        ) : null}
+
+                        {endpoint.id ==
+                        "108ac437-a990-4bc1-8c65-4913774cb723" ? (
+                          <span className="mr-1 mb-1 inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-green-600/10">
+                            TheGraph
+                          </span>
+                        ) : null}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <div className="flex items-center justify-end gap-x-2 sm:justify-start">
